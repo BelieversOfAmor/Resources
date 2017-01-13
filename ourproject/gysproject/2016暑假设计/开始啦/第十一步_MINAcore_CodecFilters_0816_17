@@ -1,0 +1,514 @@
+
+					Chapter 9 - Codec Filter
+
+					    	
+
+/*
+ *解码器 过滤器.
+ *
+ *#08#16# - #08#17# 
+ *@translator:Morpheus
+ */
+
+ 
+******************************************************************************************************************************
+*POJO（Plain Ordinary Java Object）简单的Java对象，实际就是普通JavaBeans，是为了避免和EJB混淆所创造的简称
+*(一般   具有一部分getter/setter方法的那种类 就可以称作 POJO )
+
+
+
+This tutorial tries to explain why and how to use a ProtocolCodecFilter.
+
+Why use a ProtocolCodecFilter?
+
+    TCP guarantess delivery of all packets in the correct order. But there is no guarantee that one write operation on the sender-side will result in one read event on the receiving side. see http://en.wikipedia.org/wiki/IPv4#Fragmentation_and_reassembly and http://en.wikipedia.org/wiki/Nagle%27s_algorithm In MINA terminology: without a ProtocolCodecFilter one call of IoSession.write(Object message) by the sender can result in multiple messageReceived(IoSession session, Object message) events on the receiver; and multiple calls of IoSession.write(Object message) can lead to a single messageReceived event. You might not encounter this behavior when client and server are running on the same host (or an a local network) but your applications should be able to cope with this.		
+	//TCP 保证（guarantees） 所有数据包 以 正确的顺序交付。...消息的发送端和接收端 对应问题。 难么一堆	
+
+    Most network applications need a way to find out where the current message ends and where the next message starts.
+	//大多数 网络应用程序 需要用 一种方法来 找出  当前消息的结束 和 下一个消息开始。	
+    You could implement all this logic in your IoHandler, but adding a ProtocolCodecFilter will make your code much cleaner and easier to maintain.
+	//IoHandler中 可以实现所有这些 逻辑 , 但添加一个ProtocolCodecFilter过滤器 会使 代码 更加简洁    和更容易维护。
+    It allows you to separate your protocol logic from your business logic (IoHandler).
+	//允许 分开协议 在业务逻辑里 (IoHandler)。  = =
+
+
+How ?
+
+Your application is basically just receiving a bunch of bytes and you need to convert these bytes into messages (higher level objects).
+	//应用程序 只是 收到一串字节,    需要将这些字节转换为 消息 (更高级别的对象)。
+
+There are three common techniques for splitting the stream of bytes into messages:
+	//三种 常见的 分割 字节流 到消息 的技术：
+
+    use fixed length messages	// 使用固定长度的消息。
+    use a fixed length header that indicates the length of the body
+	//使用一个固定长度的 开头  来表明 自身的 长度。
+    using a delimiter; for example many text-based protocols append a newline (or CR LF pair) after every message (http://www.faqs.org/rfcs/rfc977.html)
+	//使用分隔符,   例如 许多 基于文本的协议 附加 一个换行符 (或CR LF 对) 在每条消息之后。 
+
+
+In this tutorial we will use the first and second method since they are definitely easier to implement. Afterwards we will look at using a delimiter.
+	//接下来的教程将 使用 第一第二种（更容易实现的）方法。
+
+
+Example
+
+We will develop a (pretty useless) graphical chargen server to illustrate how to implement your own protocol codec (ProtocolEncoder, ProtocolDecoder, and ProtocolCodecFactory). The protocol is really simple. This is the layout of a request message:
+
+———————————————————————————————————————————
+4 bytes    丨	4 bytes    丨	4 bytes   丨
+width 	   丨	height 	   丨	numchars  丨
+———————————————————————————————————————————
+
+
+    width: the width of the requested image (an integer in network byte-order)
+    height: the height of the requested image (an integer in network byte-order)
+    numchars: the number of chars to generate (an integer in network byte-order)
+	//字符的数量。  
+
+The server responds with two images of the requested dimensions, with the requested number of characters painted on it. 
+This is the layout of a response message:
+————————————————————————————————————————————————————————————————————————————————
+4 bytes    丨	variable length body 丨	4 bytes     丨	variable length body   丨
+length1    丨	image1 		     丨	length2     丨	image2 		       丨
+————————————————————————————————————————————————————————————————————————————————
+
+Overview of the classes we need for encoding and decoding requests and responses:
+	//概述类我们需要的编码和解码请求和响应:
+
+1    ImageRequest: a simple POJO representing a request to our ImageServer.
+	//一个简单的POJO 代表一个请求 。   	     呼应@4
+2   ImageRequestEncoder: encodes ImageRequest objects into protocol-specific data (used by the client)
+	//编码 ImageRequest对象  为  特定的协议的数据     (客户端使用）  呼应@3
+3    ImageRequestDecoder: decodes protocol-specific data into ImageRequest objects (used by the server)
+	//解码 特定于协议的数据   到ImageRequest对象      (服务器使用）  呼应@2
+4    ImageResponse: a simple POJO representing a response from our ImageServer.
+	//一个简单的POJO代表我们ImageServer回应。      呼应@1
+5    ImageResponseEncoder: used by the server for encoding ImageResponse objects.
+	//服务器用来 编码ImageResponse对象	呼应@6
+6    ImageResponseDecoder: used by the client for decoding ImageResponse objects.
+	//客户端用来 解码ImageResponse对象	呼应@5
+7    ImageCodecFactory: this class creates the necesarry encoders and decoders.
+	//这个类创建 必要的(necessary) 编码器 和 解码器
+
+
+
+Here is the ImageRequest class :
+
+public class ImageRequest {
+
+    private int width;
+    private int height;
+    private int numberOfCharacters;
+
+    public ImageRequest(int width, int height, int numberOfCharacters) {
+        this.width = width;
+        this.height = height;
+        this.numberOfCharacters = numberOfCharacters;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public int getNumberOfCharacters() {
+        return numberOfCharacters;
+    }
+}
+
+
+
+Encoding is usually simpler than decoding, so let's start with the ImageRequestEncoder:
+	//编码通常比解码简单 , 所以先从 ImageRequestEncoder 开始:
+
+
+public class ImageRequestEncoder implements ProtocolEncoder {
+
+    public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
+        ImageRequest request = (ImageRequest) message;		//消息强转为(ImageRequest) 
+        IoBuffer buffer = IoBuffer.allocate(12, false);		//堆缓存 申请12字节
+        buffer.putInt(request.getWidth());
+        buffer.putInt(request.getHeight());
+        buffer.putInt(request.getNumberOfCharacters());
+        buffer.flip();
+        out.write(buffer);
+    }
+
+    public void dispose(IoSession session) throws Exception {
+        // nothing to dispose
+    }
+}
+
+
+
+Remarks:1234
+
+1    MINA will call the encode function for all messages in the IoSession's write queue. Since our client will only write ImageRequest objects, we can safely cast message to ImageRequest.
+	//米娜将调用编码函数 （在所有的IoSession写入队列消息中）。当 客户端仅仅写入ImageRequest对象 时 ,我们可以安全地把消息 投给ImageRequest。
+
+2    We allocate a new IoBuffer from the heap. It's best to avoid using direct buffers, since generally heap buffers perform better. see http://issues.apache.org/jira/browse/DIRMINA-289)
+	//从堆中 分配一个新的 IoBuffer。  最好避免使用 直接缓冲区 ,因为一般 堆缓冲区 表现的更好。
+3    You do not have to release the buffer, MINA will do it for you, see http://mina.apache.org/mina-project/apidocs/org/apache/mina/core/buffer/IoBuffer.html
+	//交给 MINA来  释放缓冲区。。。  
+4    In the dispose() method you should release all resources acquired during encoding for the specified session. If there is nothing to dispose you could let your encoder inherit from ProtocolEncoderAdapter.
+	//在dispose()方法中 应该释放所有（在指定Session 编码期间获得的）资源   。  要不然就 继承 ProtocolEncoderAdapter。
+
+
+Now let's have a look at the decoder. The CumulativeProtocolDecoder is a great help for writing your own decoder: it will buffer all incoming data until your decoder decides it can do something with it. In this case the message has a fixed size, so it's easiest to wait until all data is available:
+/*现在来看一下解码器。
+  CumulativeProtocolDecoder是一个伟大的 助攻 的解码器:  它会缓冲所有传入的数据 , 直到 解码器 决定 它能做些什么。
+  在这种情况下,消息都有一个固定大小的 , 所以是 最容易的 直到所有数据都可用 :
+ */
+
+
+public class ImageRequestDecoder extends CumulativeProtocolDecoder {
+
+    protected boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
+        if (in.remaining() >= 12) {
+            int width = in.getInt();
+            int height = in.getInt();
+            int numberOfCharachters = in.getInt();
+            ImageRequest request = new ImageRequest(width, height, numberOfCharachters);
+            out.write(request);
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+
+
+
+Remarks:123
+
+1    everytime a complete message is decoded, you should write it to the ProtocolDecoderOutput; these messages will travel along the filter-chain and eventually arrive in your IoHandler.messageReceived method
+	//每次一个完整的信息被解码,     应该把它写入到 ProtocolDecoderOutput;   这些消息将沿着过滤器链, 最终抵达 IoHandler.messageReceived方法
+2    you are not responsible for releasing the IoBuffer
+	//不用 负责释放 IoBuffer    。。。MINA让你省多少心 ლ(╹◡╹ლ)
+3    when there is not enough data available to decode a message, just return false
+	//当  没有足够的数据去 解码信息 时 , 仅返回 false
+
+
+The response is also a very simple POJO:
+	//响应 也是一个非常简单的 POJO:
+
+public class ImageResponse {
+
+    private BufferedImage image1;
+
+    private BufferedImage image2;
+
+    public ImageResponse(BufferedImage image1, BufferedImage image2) {
+        this.image1 = image1;
+        this.image2 = image2;
+    }
+
+    public BufferedImage getImage1() {
+        return image1;
+    }
+
+    public BufferedImage getImage2() {
+        return image2;
+    }
+}
+
+
+
+Encoding the response is also trivial:
+	//编码 响应 :
+
+public class ImageResponseEncoder extends ProtocolEncoderAdapter {
+
+    public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
+        ImageResponse imageResponse = (ImageResponse) message;
+        byte[] bytes1 = getBytes(imageResponse.getImage1());
+        byte[] bytes2 = getBytes(imageResponse.getImage2());
+        int capacity = bytes1.length + bytes2.length + 8;
+        IoBuffer buffer = IoBuffer.allocate(capacity, false);	//还是堆。。
+        buffer.setAutoExpand(true);
+        buffer.putInt(bytes1.length);
+        buffer.put(bytes1);
+        buffer.putInt(bytes2.length);
+        buffer.put(bytes2);
+        buffer.flip();
+        out.write(buffer);
+    }
+
+    private byte[] getBytes(BufferedImage image) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(image, "PNG", baos);
+        return baos.toByteArray();
+    }
+}
+
+
+
+Remarks:1
+
+1    when it is impossible to calculate the length of the IoBuffer beforehand, you can use an auto-expanding buffer by calling buffer.setAutoExpand(true);
+	//当不能 事先计算IoBuffer的长度 时 ,  可以 通过调用buffer.setAutoExpand(ture)来使用一个 auto-expanding 缓冲区;
+
+
+Now let's have a look at decoding the response:
+
+	
+
+public class ImageResponseDecoder extends CumulativeProtocolDecoder {
+
+    private static final String DECODER_STATE_KEY = ImageResponseDecoder.class.getName() + ".STATE";
+
+    public static final int MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+
+    private static class DecoderState {
+        BufferedImage image1;
+    }
+
+    protected boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
+        DecoderState decoderState = (DecoderState) session.getAttribute(DECODER_STATE_KEY);
+        if (decoderState == null) {
+            decoderState = new DecoderState();
+            session.setAttribute(DECODER_STATE_KEY, decoderState);
+        }
+        if (decoderState.image1 == null) {
+            // try to read first image
+            if (in.prefixedDataAvailable(4, MAX_IMAGE_SIZE)) {
+                decoderState.image1 = readImage(in);
+            } else {
+                // not enough data available to read first image
+                return false;
+            }
+        }
+        if (decoderState.image1 != null) {
+            // try to read second image
+            if (in.prefixedDataAvailable(4, MAX_IMAGE_SIZE)) {
+                BufferedImage image2 = readImage(in);
+                ImageResponse imageResponse = new ImageResponse(decoderState.image1, image2);
+                out.write(imageResponse);
+                decoderState.image1 = null;
+                return true;
+            } else {
+                // not enough data available to read second image
+                return false;
+            }
+        }
+        return false;
+    }
+
+    private BufferedImage readImage(IoBuffer in) throws IOException {
+        int length = in.getInt();
+        byte[] bytes = new byte[length];
+        in.get(bytes);
+        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+        return ImageIO.read(bais);
+    }
+}
+
+
+
+Remarks:
+
+    + We store the state of the decoding process in a session attribute. It would also be possible to store this state in the Decoder object itself but this has several disadvantages: 1234
+	//在Session属性中储存解码过程的状态 。也可以储存在解码器本身,但是 有如下 几个缺点:123
+							（既然有那么多缺点  就暂时不选择 储存在解码器本身 咧。）（简单了解下）
+       1  every IoSession would need its own Decoder instance
+		//每个IoSession需要自己的译码器实例
+       2  MINA ensures that there will never be more than one thread simultaneously executing the decode() function for the same IoSession, but it does not guarantee that it will always be the same thread. Suppose the first piece of data is handled by thread-1 who decides it cannot yet decode, when the next piece of data arrives, it could be handled by another thread. To avoid visibility problems, you must properly synchronize access to this decoder state (IoSession attributes are stored in a ConcurrentHashMap, so they are automatically visible to other threads).
+		//米娜确保不会有多个线程同时执行同一decode()方法  对于相似的IoSession  ,  but  并 不能保证它永远是相同的线程。    然后 = =  假设。
+       3  a discussion on the mailing list has lead to this conclusion: choosing between storing state in the IoSession or in the Decoder instance itself is more a matter of taste. To ensure that no two threads will run the decode method for the same IoSession, MINA needs to do some form of synchronization => this synchronization will also ensure you can't have the visibility problem described above. (Thanks to Adam Fisk for pointing this out) see http://www.nabble.com/Tutorial-on-ProtocolCodecFilter,-state-and-threads-t3965413.html
+		// 结论竟然是 还是存储在 Session属性中   = = 
+
+     IoBuffer.prefixedDataAvailable() is very convenient when your protocol uses a length-prefix; it supports a prefix of 1, 2 or 4 bytes.
+	//当 协议使用length-prefix(长度前缀）时用 IoBuffer.prefixedDataAvailable()方法 很方便    。  支持 1、2或4字节 作为前缀。。。（方法参数么？1 2 4）
+     don't forget to reset the decoder state when you've decoded a response (removing the session attribute is another way to do it)
+	//当解码一个响应时   不要 忘记 重设解码器状态   (另一种方式是 移除session属性)
+
+
+
+
+
+If the response would consist of a single image, we would not need to store decoder state:
+	//如果响应 包括一个图像,  不需要存储解码器 状态:
+
+protected boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
+    if (in.prefixedDataAvailable(4)) {
+        int length = in.getInt();
+        byte[] bytes = new byte[length];
+        in.get(bytes);
+        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+        BufferedImage image = ImageIO.read(bais);
+        out.write(image);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+Now let's glue it all together:	//合并在一起\\
+
+public class ImageCodecFactory implements ProtocolCodecFactory {
+    private ProtocolEncoder encoder;
+    private ProtocolDecoder decoder;
+
+    public ImageCodecFactory(boolean client) {
+        if (client) {
+            encoder = new ImageRequestEncoder();
+            decoder = new ImageResponseDecoder();
+        } else {
+            encoder = new ImageResponseEncoder();
+            decoder = new ImageRequestDecoder();
+        }
+    }
+
+    public ProtocolEncoder getEncoder(IoSession ioSession) throws Exception {
+        return encoder;
+    }
+
+    public ProtocolDecoder getDecoder(IoSession ioSession) throws Exception {
+        return decoder;
+    }
+}
+
+
+
+Remarks:
+
+    for every new session, MINA will ask the ImageCodecFactory for an encoder and a decoder.
+	//每一个新session , 米娜会 通过 ImageCodecFactory  叫来 编码器和解码器。 ლ(╹◡╹ლ)
+    since our encoders and decoders store no conversational state, it is safe to let all sessions share a single instance.
+	//当  编码器 和 解码器 不存储session状态 , ,让所有session共享一个实例才是安全的。
+
+
+This is how the server would use the ProtocolCodecFactory:
+	//服务器 使用 ProtocolCodecFactory:
+
+public class ImageServer {
+    public static final int PORT = 33789;
+
+    public static void main(String[] args) throws IOException {
+        ImageServerIoHandler handler = new ImageServerIoHandler();
+        NioSocketAcceptor acceptor = new NioSocketAcceptor();
+        acceptor.getFilterChain().addLast("protocol", new ProtocolCodecFilter(new ImageCodecFactory(false)));
+        acceptor.setLocalAddress(new InetSocketAddress(PORT));
+        acceptor.setHandler(handler);
+        acceptor.bind();
+        System.out.println("server is listenig at port " + PORT);
+    }
+}
+
+
+
+Usage by the client is identical:
+	//客户端 一个样:
+
+public class ImageClient extends IoHandlerAdapter {
+    public static final int CONNECT_TIMEOUT = 3000;
+
+    private String host;
+    private int port;
+    private SocketConnector connector;
+    private IoSession session;
+    private ImageListener imageListener;
+
+    public ImageClient(String host, int port, ImageListener imageListener) {
+        this.host = host;
+        this.port = port;
+        this.imageListener = imageListener;
+        connector = new NioSocketConnector();
+        connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new ImageCodecFactory(true)));	//ture/false 仅用来区别 C/S （参照前文）
+	     //服务器：acceptor.getFilterChain().addLast("protocol", new ProtocolCodecFilter(new ImageCodecFactory(false)));  //94这一句   一模一样
+        connector.setHandler(this);
+    }
+
+    public void messageReceived(IoSession session, Object message) throws Exception {
+        ImageResponse response = (ImageResponse) message;
+        imageListener.onImages(response.getImage1(), response.getImage2());
+    }
+    ...
+
+
+
+For completeness, I will add the code for the server-side IoHandler:
+	//考虑到 完整性 ,   加上 服务器端IoHandler的代码:      
+
+
+public class ImageServerIoHandler extends IoHandlerAdapter {
+
+    private final static String characters = "mina rocks abcdefghijklmnopqrstuvwxyz0123456789";
+
+    public static final String INDEX_KEY = ImageServerIoHandler.class.getName() + ".INDEX";
+
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    public void sessionOpened(IoSession session) throws Exception {
+        session.setAttribute(INDEX_KEY, 0);
+    }
+
+    public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
+        IoSessionLogger sessionLogger = IoSessionLogger.getLogger(session, logger);
+        sessionLogger.warn(cause.getMessage(), cause);
+    }
+
+    public void messageReceived(IoSession session, Object message) throws Exception {
+        ImageRequest request = (ImageRequest) message;
+        String text1 = generateString(session, request.getNumberOfCharacters());
+        String text2 = generateString(session, request.getNumberOfCharacters());
+        BufferedImage image1 = createImage(request, text1);
+        BufferedImage image2 = createImage(request, text2);
+        ImageResponse response = new ImageResponse(image1, image2);
+        session.write(response);
+    }
+
+    private BufferedImage createImage(ImageRequest request, String text) {
+        BufferedImage image = new BufferedImage(request.getWidth(), request.getHeight(), BufferedImage.TYPE_BYTE_INDEXED);
+        Graphics graphics = image.createGraphics();
+        graphics.setColor(Color.YELLOW);
+        graphics.fillRect(0, 0, image.getWidth(), image.getHeight());
+        Font serif = new Font("serif", Font.PLAIN, 30);
+        graphics.setFont(serif);
+        graphics.setColor(Color.BLUE);
+        graphics.drawString(text, 10, 50);
+        return image;
+    }
+
+    private String generateString(IoSession session, int length) {
+        Integer index = (Integer) session.getAttribute(INDEX_KEY);
+        StringBuffer buffer = new StringBuffer(length);
+
+        while (buffer.length() < length) {
+            buffer.append(characters.charAt(index));
+            index++;
+            if (index >= characters.length()) {
+                index = 0;
+            }
+        }
+        session.setAttribute(INDEX_KEY, index);
+        return buffer.toString();
+    }
+}
+
+
+//此处应有贴图，  return 的 Image .        先放我兜里把。不 commit  le
+
+
+
+
+
+Conclusion：
+
+There is a lot more to tell about encoding and decoding. But I hope this tutorial already gets you started. I will try to add something about the DemuxingProtocolCodecFactory in the near future. And then we will also have a look at how to use a delimiter instead of a length prefix.
+
+//讲了很多关于 编码和解码。 
+//在不久的将来  将要试着加一些与 DemuxingProtocolCodecFactory  有关的 恩。
+//然后    我们 也会关注  如何使用分隔符,而不是长度的前缀 。
+
+
+********************************************************************************************************************************
+*谢谢，感激. (╥_╥) 。
+
+就酱紫，一步步拆分MINA。。。
+

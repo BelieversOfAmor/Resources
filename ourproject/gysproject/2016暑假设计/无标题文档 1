@@ -1,0 +1,10 @@
+  145  apt-get install libappindicator3-1
+  146  libappindicator
+  147  li
+  148  libnetcfg 
+  149  cd 下载
+  150  dpkg -i lantern-installer-64.deb
+  151  apt-get install libappindicator3-1
+  152  lantern
+
+

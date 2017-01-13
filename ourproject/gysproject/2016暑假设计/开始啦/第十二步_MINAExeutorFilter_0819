@@ -1,0 +1,23 @@
+			Chapter 10 - Executor Filter
+				     执行人过滤器。
+/*
+ *#08#19#
+ *@translator:morpheus.
+ */
+
+****************************************************************************************************************************
+
+MINA 1.X version let the user define the Thread Model at the Acceptor level. It was part of the Acceptor configuration. This led to complexity, and the MINA team decided to remove this option, replacing it with a much more versatile system, based on a filter : the ExecutorFilter.
+The ExecutorFilter class
+	//MINA  de  1.x 版本让用户定义的 线程模型 在Acceptor水平  。 这是Acceptor配置的一部分。
+	//这导致了复杂性,  MINA 团队 决定删除这个 选项 , 代之以一个更通用的系统 , 基于一个过滤器 : ExecutorFilter。
+
+
+This class is implementing the IoFilter interface, and basically, it contains an Executor to spread the incoming events to a pool of threads. This will allow an application to use more efficiently the processors, if some task is CPU intensive.
+	//这个类实现了IoFilter接口 , 基本上,它包含一个执行人将传入的事件传递给线程池。这将允许应用程序使用更高效的 处理器 , 假如 task是一些是CPU密集型 的话。
+
+This Filter can be used just before the handlers, assuming that most of the processing will be done in your application, or somewhere before some CPU intensive filter (for instance, a CodecFilter).
+	//这个过滤器 仅可以 用 在处理程序之前 , （ 假设大多数的 处理 都将完成  在应用程序中 , 或者 在某个 CPU密集型过滤器中(例如,一个CodecFilter)）。
+
+******************************************************************************************************************************
+* 将要返校 ，时间很杂。。。

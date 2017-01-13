@@ -1,0 +1,32 @@
+service postgresql start
+
+# pgAdmin4
+cd /usr/local/lib/python2.7/dist-packages/pgadmin4
+python pgAdmin4.py
+
+
+
+
+# wildfly服务器
+
+cd ../home/morpheus/devel/wildfly-10.1.0.Final/bin/
+./standalone
+
+
+
+#
+#{
+#    "server":"45.78.33.246",
+#    "server_port":8998,
+#    "local_address": "127.0.0.1",
+#    "local_port":1080,
+#    "password":"softlab@314",
+#    "timeout":600,
+#    "method":"RC4-MD5",
+#    "fast_open": false
+#}
+
+
+
+
+

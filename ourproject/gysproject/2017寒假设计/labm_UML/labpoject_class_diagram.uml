@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uml:Model xmi:version="2.1" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmlns:uml="http://www.eclipse.org/uml2/3.0.0/UML" xmi:id="_floCIMHdEeasPrE7DUtEdQ" name="labpojectzero">
+  <eAnnotations xmi:id="_floCIcHdEeasPrE7DUtEdQ" source="Objing">
+    <contents xmi:type="uml:Property" xmi:id="_floCIsHdEeasPrE7DUtEdQ" name="exporterVersion">
+      <defaultValue xmi:type="uml:LiteralString" xmi:id="_floCI8HdEeasPrE7DUtEdQ" value="3.0.0"/>
+    </contents>
+  </eAnnotations>
+  <packagedElement xmi:type="uml:Class" xmi:id="_floCJMHdEeasPrE7DUtEdQ" name="教师">
+    <ownedAttribute xmi:id="_floCJcHdEeasPrE7DUtEdQ" name="1" visibility="public" type="_flopNsHdEeasPrE7DUtEdQ" association="_floCL8HdEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_floCJsHdEeasPrE7DUtEdQ"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:id="_floCJ8HdEeasPrE7DUtEdQ" name="usr_name" visibility="public" isUnique="false">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:id="_floCKMHdEeasPrE7DUtEdQ" name="usr_pwd" visibility="public" isUnique="false">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:id="_floCKcHdEeasPrE7DUtEdQ" name="name" visibility="public" isUnique="false">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:id="_floCKsHdEeasPrE7DUtEdQ" name="level" visibility="public" isUnique="false">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+    </ownedAttribute>
+    <ownedOperation xmi:id="_floCK8HdEeasPrE7DUtEdQ" name="物品入库" visibility="public"/>
+    <ownedOperation xmi:id="_floCLMHdEeasPrE7DUtEdQ" name="物品出库" visibility="public"/>
+    <ownedOperation xmi:id="_floCLcHdEeasPrE7DUtEdQ" name="管理报表" visibility="public"/>
+    <ownedOperation xmi:id="_floCLsHdEeasPrE7DUtEdQ" name="管理学生" visibility="public"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_floCL8HdEeasPrE7DUtEdQ" memberEnd="_floCJcHdEeasPrE7DUtEdQ _floCMMHdEeasPrE7DUtEdQ">
+    <ownedEnd xmi:id="_floCMMHdEeasPrE7DUtEdQ" visibility="public" type="_floCJMHdEeasPrE7DUtEdQ" association="_floCL8HdEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_floCMcHdEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_floCMsHdEeasPrE7DUtEdQ" name="学生">
+    <ownedAttribute xmi:id="_floCM8HdEeasPrE7DUtEdQ" name="3" visibility="public" type="_flopNsHdEeasPrE7DUtEdQ" association="_floCO8HdEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_floCNMHdEeasPrE7DUtEdQ"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:id="_floCNcHdEeasPrE7DUtEdQ" name="stu_name" visibility="public" isUnique="false">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:id="_floCNsHdEeasPrE7DUtEdQ" name="stu_pwd" visibility="public" isUnique="false">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:id="_floCN8HdEeasPrE7DUtEdQ" name="name" visibility="public" isUnique="false">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:id="_floCOMHdEeasPrE7DUtEdQ" name="level" visibility="public" isUnique="false">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+    </ownedAttribute>
+    <ownedOperation xmi:id="_floCOcHdEeasPrE7DUtEdQ" name="物品借用" visibility="public"/>
+    <ownedOperation xmi:id="_floCOsHdEeasPrE7DUtEdQ" name="物品归还" visibility="public"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_floCO8HdEeasPrE7DUtEdQ" memberEnd="_floCM8HdEeasPrE7DUtEdQ _floCPMHdEeasPrE7DUtEdQ">
+    <ownedEnd xmi:id="_floCPMHdEeasPrE7DUtEdQ" visibility="public" type="_floCMsHdEeasPrE7DUtEdQ" association="_floCO8HdEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_floCPcHdEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_floCPsHdEeasPrE7DUtEdQ" name="助教">
+    <ownedAttribute xmi:id="_floCP8HdEeasPrE7DUtEdQ" name="2" visibility="public" type="_flopNsHdEeasPrE7DUtEdQ" association="_floCSMHdEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_floCQMHdEeasPrE7DUtEdQ"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:id="_floCQcHdEeasPrE7DUtEdQ" name="usr_name" visibility="public" isUnique="false">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:id="_floCQsHdEeasPrE7DUtEdQ" name="usr_pwd" visibility="public" isUnique="false">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:id="_floCQ8HdEeasPrE7DUtEdQ" name="name" visibility="public" isUnique="false">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:id="_floCRMHdEeasPrE7DUtEdQ" name="level" visibility="public" isUnique="false">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+    </ownedAttribute>
+    <ownedOperation xmi:id="_floCRcHdEeasPrE7DUtEdQ" name="物品入库" visibility="public"/>
+    <ownedOperation xmi:id="_floCRsHdEeasPrE7DUtEdQ" name="物品出库" visibility="public"/>
+    <ownedOperation xmi:id="_floCR8HdEeasPrE7DUtEdQ" name="管理报表" visibility="public"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_floCSMHdEeasPrE7DUtEdQ" memberEnd="_floCP8HdEeasPrE7DUtEdQ _floCScHdEeasPrE7DUtEdQ">
+    <ownedEnd xmi:id="_floCScHdEeasPrE7DUtEdQ" visibility="public" type="_floCPsHdEeasPrE7DUtEdQ" association="_floCSMHdEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_floCSsHdEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_floCS8HdEeasPrE7DUtEdQ" name="超级管理员">
+    <ownedAttribute xmi:id="_floCTMHdEeasPrE7DUtEdQ" name="0" visibility="public" type="_flopNsHdEeasPrE7DUtEdQ" association="_flopM8HdEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_floCTcHdEeasPrE7DUtEdQ"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:id="_floCTsHdEeasPrE7DUtEdQ" name="admin_name" visibility="public" isUnique="false">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:id="_floCT8HdEeasPrE7DUtEdQ" name="admin_pwd" visibility="public" isUnique="false">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:id="_floCUMHdEeasPrE7DUtEdQ" name="name" visibility="public" isUnique="false">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:id="_floCUcHdEeasPrE7DUtEdQ" name="level" visibility="public" isUnique="false">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+    </ownedAttribute>
+    <ownedOperation xmi:id="_flopMMHdEeasPrE7DUtEdQ" name="管理用户" visibility="public"/>
+    <ownedOperation xmi:id="_flopMcHdEeasPrE7DUtEdQ" name="管理权限" visibility="public"/>
+    <ownedOperation xmi:id="_flopMsHdEeasPrE7DUtEdQ" name="管理档案" visibility="public"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_flopM8HdEeasPrE7DUtEdQ" memberEnd="_floCTMHdEeasPrE7DUtEdQ _flopNMHdEeasPrE7DUtEdQ">
+    <ownedEnd xmi:id="_flopNMHdEeasPrE7DUtEdQ" visibility="public" type="_floCS8HdEeasPrE7DUtEdQ" association="_flopM8HdEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_flopNcHdEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_flopNsHdEeasPrE7DUtEdQ" name="实验室物品管理系统"/>
+</uml:Model>

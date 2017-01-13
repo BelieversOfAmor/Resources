@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uml:Model xmi:version="2.1" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmlns:uml="http://www.eclipse.org/uml2/3.0.0/UML" xmi:id="_u-mCIMHbEeasPrE7DUtEdQ" name="labproject">
+  <eAnnotations xmi:id="_u-mpMMHbEeasPrE7DUtEdQ" source="Objing">
+    <contents xmi:type="uml:Property" xmi:id="_u-mpMcHbEeasPrE7DUtEdQ" name="exporterVersion">
+      <defaultValue xmi:type="uml:LiteralString" xmi:id="_u-mpMsHbEeasPrE7DUtEdQ" value="3.0.0"/>
+    </contents>
+  </eAnnotations>
+  <packagedElement xmi:type="uml:Actor" xmi:id="_u-mpM8HbEeasPrE7DUtEdQ" name="教师"/>
+  <packagedElement xmi:type="uml:Association" xmi:id="_u-mpNMHbEeasPrE7DUtEdQ" memberEnd="_u-mpNcHbEeasPrE7DUtEdQ _u-mpN8HbEeasPrE7DUtEdQ" navigableOwnedEnd="_u-mpNcHbEeasPrE7DUtEdQ">
+    <ownedEnd xmi:id="_u-mpNcHbEeasPrE7DUtEdQ" visibility="public" type="_u-mpiMHbEeasPrE7DUtEdQ" association="_u-mpNMHbEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_u-mpNsHbEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+    <ownedEnd xmi:id="_u-mpN8HbEeasPrE7DUtEdQ" visibility="public" type="_u-mpM8HbEeasPrE7DUtEdQ" association="_u-mpNMHbEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_u-mpOMHbEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_u-mpOcHbEeasPrE7DUtEdQ" memberEnd="_u-mpOsHbEeasPrE7DUtEdQ _u-mpPMHbEeasPrE7DUtEdQ" navigableOwnedEnd="_u-mpOsHbEeasPrE7DUtEdQ">
+    <ownedEnd xmi:id="_u-mpOsHbEeasPrE7DUtEdQ" visibility="public" type="_u-mpp8HbEeasPrE7DUtEdQ" association="_u-mpOcHbEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_u-mpO8HbEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+    <ownedEnd xmi:id="_u-mpPMHbEeasPrE7DUtEdQ" visibility="public" type="_u-mpM8HbEeasPrE7DUtEdQ" association="_u-mpOcHbEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_u-mpPcHbEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_u-mpPsHbEeasPrE7DUtEdQ" memberEnd="_u-mpP8HbEeasPrE7DUtEdQ _u-mpQcHbEeasPrE7DUtEdQ" navigableOwnedEnd="_u-mpP8HbEeasPrE7DUtEdQ">
+    <ownedEnd xmi:id="_u-mpP8HbEeasPrE7DUtEdQ" visibility="public" type="_u-mpgcHbEeasPrE7DUtEdQ" association="_u-mpPsHbEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_u-mpQMHbEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+    <ownedEnd xmi:id="_u-mpQcHbEeasPrE7DUtEdQ" visibility="public" type="_u-mpM8HbEeasPrE7DUtEdQ" association="_u-mpPsHbEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_u-mpQsHbEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Actor" xmi:id="_u-mpQ8HbEeasPrE7DUtEdQ" name="超级管理员"/>
+  <packagedElement xmi:type="uml:Association" xmi:id="_u-mpRMHbEeasPrE7DUtEdQ" memberEnd="_u-mpRcHbEeasPrE7DUtEdQ _u-mpR8HbEeasPrE7DUtEdQ" navigableOwnedEnd="_u-mpRcHbEeasPrE7DUtEdQ">
+    <ownedEnd xmi:id="_u-mpRcHbEeasPrE7DUtEdQ" visibility="public" type="_u-mpZMHbEeasPrE7DUtEdQ" association="_u-mpRMHbEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_u-mpRsHbEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+    <ownedEnd xmi:id="_u-mpR8HbEeasPrE7DUtEdQ" visibility="public" type="_u-mpQ8HbEeasPrE7DUtEdQ" association="_u-mpRMHbEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_u-mpSMHbEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_u-mpScHbEeasPrE7DUtEdQ" memberEnd="_u-mpSsHbEeasPrE7DUtEdQ _u-mpTMHbEeasPrE7DUtEdQ" navigableOwnedEnd="_u-mpSsHbEeasPrE7DUtEdQ">
+    <ownedEnd xmi:id="_u-mpSsHbEeasPrE7DUtEdQ" visibility="public" type="_u-mpesHbEeasPrE7DUtEdQ" association="_u-mpScHbEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_u-mpS8HbEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+    <ownedEnd xmi:id="_u-mpTMHbEeasPrE7DUtEdQ" visibility="public" type="_u-mpQ8HbEeasPrE7DUtEdQ" association="_u-mpScHbEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_u-mpTcHbEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Actor" xmi:id="_u-mpTsHbEeasPrE7DUtEdQ" name="助教"/>
+  <packagedElement xmi:type="uml:Association" xmi:id="_u-mpT8HbEeasPrE7DUtEdQ" memberEnd="_u-mpUMHbEeasPrE7DUtEdQ _u-mpUsHbEeasPrE7DUtEdQ" navigableOwnedEnd="_u-mpUMHbEeasPrE7DUtEdQ">
+    <ownedEnd xmi:id="_u-mpUMHbEeasPrE7DUtEdQ" visibility="public" type="_u-mpgcHbEeasPrE7DUtEdQ" association="_u-mpT8HbEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_u-mpUcHbEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+    <ownedEnd xmi:id="_u-mpUsHbEeasPrE7DUtEdQ" visibility="public" type="_u-mpTsHbEeasPrE7DUtEdQ" association="_u-mpT8HbEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_u-mpU8HbEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_u-mpVMHbEeasPrE7DUtEdQ" memberEnd="_u-mpVcHbEeasPrE7DUtEdQ _u-mpV8HbEeasPrE7DUtEdQ" navigableOwnedEnd="_u-mpVcHbEeasPrE7DUtEdQ">
+    <ownedEnd xmi:id="_u-mpVcHbEeasPrE7DUtEdQ" visibility="public" type="_u-mpp8HbEeasPrE7DUtEdQ" association="_u-mpVMHbEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_u-mpVsHbEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+    <ownedEnd xmi:id="_u-mpV8HbEeasPrE7DUtEdQ" visibility="public" type="_u-mpTsHbEeasPrE7DUtEdQ" association="_u-mpVMHbEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_u-mpWMHbEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Actor" xmi:id="_u-mpWcHbEeasPrE7DUtEdQ" name="学生"/>
+  <packagedElement xmi:type="uml:Association" xmi:id="_u-mpWsHbEeasPrE7DUtEdQ" memberEnd="_u-mpW8HbEeasPrE7DUtEdQ _u-mpXcHbEeasPrE7DUtEdQ" navigableOwnedEnd="_u-mpW8HbEeasPrE7DUtEdQ">
+    <ownedEnd xmi:id="_u-mpW8HbEeasPrE7DUtEdQ" visibility="public" type="_u-mpmcHbEeasPrE7DUtEdQ" association="_u-mpWsHbEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_u-mpXMHbEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+    <ownedEnd xmi:id="_u-mpXcHbEeasPrE7DUtEdQ" visibility="public" type="_u-mpWcHbEeasPrE7DUtEdQ" association="_u-mpWsHbEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_u-mpXsHbEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_u-mpX8HbEeasPrE7DUtEdQ" memberEnd="_u-mpYMHbEeasPrE7DUtEdQ _u-mpYsHbEeasPrE7DUtEdQ" navigableOwnedEnd="_u-mpYMHbEeasPrE7DUtEdQ">
+    <ownedEnd xmi:id="_u-mpYMHbEeasPrE7DUtEdQ" visibility="public" type="_u-mpoMHbEeasPrE7DUtEdQ" association="_u-mpX8HbEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_u-mpYcHbEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+    <ownedEnd xmi:id="_u-mpYsHbEeasPrE7DUtEdQ" visibility="public" type="_u-mpWcHbEeasPrE7DUtEdQ" association="_u-mpX8HbEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_u-mpY8HbEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+  </packagedElement>
+  <packagedElement xmi:type="uml:UseCase" xmi:id="_u-mpZMHbEeasPrE7DUtEdQ" name="管理用户">
+    <ownedComment xmi:id="_u-mpZcHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mpZsHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mpZ8HbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mpaMHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mpacHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mpasHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_u-mpa8HbEeasPrE7DUtEdQ" memberEnd="_u-mpbMHbEeasPrE7DUtEdQ _u-mpbsHbEeasPrE7DUtEdQ" navigableOwnedEnd="_u-mpbMHbEeasPrE7DUtEdQ">
+    <ownedEnd xmi:id="_u-mpbMHbEeasPrE7DUtEdQ" visibility="public" type="_u-mpM8HbEeasPrE7DUtEdQ" association="_u-mpa8HbEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_u-mpbcHbEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+    <ownedEnd xmi:id="_u-mpbsHbEeasPrE7DUtEdQ" visibility="public" type="_u-mpZMHbEeasPrE7DUtEdQ" association="_u-mpa8HbEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_u-mpb8HbEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_u-mpcMHbEeasPrE7DUtEdQ" memberEnd="_u-mpccHbEeasPrE7DUtEdQ _u-mpc8HbEeasPrE7DUtEdQ" navigableOwnedEnd="_u-mpccHbEeasPrE7DUtEdQ">
+    <ownedEnd xmi:id="_u-mpccHbEeasPrE7DUtEdQ" visibility="public" type="_u-mpTsHbEeasPrE7DUtEdQ" association="_u-mpcMHbEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_u-mpcsHbEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+    <ownedEnd xmi:id="_u-mpc8HbEeasPrE7DUtEdQ" visibility="public" type="_u-mpZMHbEeasPrE7DUtEdQ" association="_u-mpcMHbEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_u-mpdMHbEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_u-mpdcHbEeasPrE7DUtEdQ" memberEnd="_u-mpdsHbEeasPrE7DUtEdQ _u-mpeMHbEeasPrE7DUtEdQ" navigableOwnedEnd="_u-mpdsHbEeasPrE7DUtEdQ">
+    <ownedEnd xmi:id="_u-mpdsHbEeasPrE7DUtEdQ" visibility="public" type="_u-mpWcHbEeasPrE7DUtEdQ" association="_u-mpdcHbEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_u-mpd8HbEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+    <ownedEnd xmi:id="_u-mpeMHbEeasPrE7DUtEdQ" visibility="public" type="_u-mpZMHbEeasPrE7DUtEdQ" association="_u-mpdcHbEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_u-mpecHbEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+  </packagedElement>
+  <packagedElement xmi:type="uml:UseCase" xmi:id="_u-mpesHbEeasPrE7DUtEdQ" name="管理数据">
+    <ownedComment xmi:id="_u-mpe8HbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mpfMHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mpfcHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mpfsHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mpf8HbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mpgMHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+  </packagedElement>
+  <packagedElement xmi:type="uml:UseCase" xmi:id="_u-mpgcHbEeasPrE7DUtEdQ" name="管理档案">
+    <ownedComment xmi:id="_u-mpgsHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mpg8HbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mphMHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mphcHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mphsHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mph8HbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+  </packagedElement>
+  <packagedElement xmi:type="uml:UseCase" xmi:id="_u-mpiMHbEeasPrE7DUtEdQ" name="管理学生">
+    <ownedComment xmi:id="_u-mpicHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mpisHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mpi8HbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mpjMHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mpjcHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mpjsHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_u-mpj8HbEeasPrE7DUtEdQ" memberEnd="_u-mpkMHbEeasPrE7DUtEdQ _u-mpksHbEeasPrE7DUtEdQ" navigableOwnedEnd="_u-mpkMHbEeasPrE7DUtEdQ">
+    <ownedEnd xmi:id="_u-mpkMHbEeasPrE7DUtEdQ" visibility="public" type="_u-mpWcHbEeasPrE7DUtEdQ" association="_u-mpj8HbEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_u-mpkcHbEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+    <ownedEnd xmi:id="_u-mpksHbEeasPrE7DUtEdQ" visibility="public" type="_u-mpiMHbEeasPrE7DUtEdQ" association="_u-mpj8HbEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_u-mpk8HbEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_u-mplMHbEeasPrE7DUtEdQ" memberEnd="_u-mplcHbEeasPrE7DUtEdQ _u-mpl8HbEeasPrE7DUtEdQ" navigableOwnedEnd="_u-mplcHbEeasPrE7DUtEdQ">
+    <ownedEnd xmi:id="_u-mplcHbEeasPrE7DUtEdQ" visibility="public" type="_u-mpiMHbEeasPrE7DUtEdQ" association="_u-mplMHbEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_u-mplsHbEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+    <ownedEnd xmi:id="_u-mpl8HbEeasPrE7DUtEdQ" visibility="public" type="_u-mpiMHbEeasPrE7DUtEdQ" association="_u-mplMHbEeasPrE7DUtEdQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_u-mpmMHbEeasPrE7DUtEdQ"/>
+    </ownedEnd>
+  </packagedElement>
+  <packagedElement xmi:type="uml:UseCase" xmi:id="_u-mpmcHbEeasPrE7DUtEdQ" name="借用物品">
+    <ownedComment xmi:id="_u-mpmsHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mpm8HbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mpnMHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mpncHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mpnsHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mpn8HbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+  </packagedElement>
+  <packagedElement xmi:type="uml:UseCase" xmi:id="_u-mpoMHbEeasPrE7DUtEdQ" name="归还物品">
+    <ownedComment xmi:id="_u-mpocHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mposHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mpo8HbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mppMHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mppcHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mppsHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+  </packagedElement>
+  <packagedElement xmi:type="uml:UseCase" xmi:id="_u-mpp8HbEeasPrE7DUtEdQ" name="管理物品">
+    <ownedComment xmi:id="_u-mpqMHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mpqcHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mpqsHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mpq8HbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mprMHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+    <ownedComment xmi:id="_u-mprcHbEeasPrE7DUtEdQ">
+      <body>...</body>
+    </ownedComment>
+  </packagedElement>
+</uml:Model>

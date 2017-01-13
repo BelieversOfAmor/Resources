@@ -1,0 +1,207 @@
+		Chapter 5 - Filters¶
+  #08#14#
+****************************************************************************************************
+
+IoFilter is one of the MINA core constructs that serves a very important role. It filters all I/O events and requests between IoService and IoHandler. If you have an experience with web application programming, you can safely think that it's a cousin of Servlet filter. Many out-of-the-box filters are provided to accelerate network application development pace by simplifying typical cross-cutting concerns using the out-of-the-box filters such as:
+/*IoFilter是一个米娜核心结构，扮演很重要的角色。。它过滤了所有I / O事件和（IoService和IoHandler之间的）请求。
+  如果你有开发WEB应用程序的经验,你可以放心大胆地认为这是一个Servlet过滤器的大表哥  \哈哈哈哈/。ლ(╹◡╹ლ)
+  许多out-of-the-box的过滤器提供加速网络应用程序开发的速度  通过简化使用out-of-the-box过滤器 等典型的横切关注点 :   = = = =好难好难
+ 	开箱即用 = =	    					        开箱即用
+*/
+
+    LoggingFilter logs all events and requests.		//LoggingFilter记录所有事件和请求
+    ProtocolCodecFilter converts an incoming ByteBuffer into message POJO and vice versa.
+	//ProtocolCodecFilter将传入的ByteBuffer转换成消息POJO,反过来也行。
+    CompressionFilter compresses all data.		//CompressionFilter压缩所有数据。
+    SSLFilter adds SSL - TLS - StartTLS support.	//SSLFilter添加SSL - TLS StartTLS支持。
+    and many more!					//and balabala。。
+
+In this tutorial, we will walk through how to implement an IoFilter for a real world use case. It's easy to implement an IoFilter in general, but you might also need to know specifics of MINA internals. Any related internal properties will be explained here.
+//知道了MINA的内部细节后，，，建立一个IoFilter将会非常简单 = =   。。。。。下面实例介绍所有属性细节
+
+    Chapter 5 - Filters              
+        Filters already present
+        Overriding Events Selectively
+        Transforming a Write Request
+        Be Careful When Filtering sessionCreated Event
+        Watch out the Empty Buffers!
+
+Filters already present    	//喏 Filters
+
+We have many filters already written. The following table list all the existing filters, with a short description of their usage.
+//许多已有 过滤器。   下表列出 所有现有的过滤器,
+
+Filter 				class	 			Description
+
+Blacklist 			BlacklistFilter 		Blocks connections from blacklisted remote addresses	//黑名单 = =
+Buffered Write 			BufferedWriteFilter 		Buffers outgoing requests like the BufferedOutputStream does //缓冲写入
+Compression 			CompressionFilter 	 	
+ConnectionThrottle 		ConnectionThrottleFilter 	
+ErrorGenerating 		ErrorGeneratingFilter 	 	
+Executor 			ExecutorFilter 	 		
+FileRegionWrite 		FileRegionWriteFilter 	 	
+KeepAlive 			KeepAliveFilter 	 	
+Logging 			LoggingFilter 			Logs event messages, like MessageReceived, MessageSent, SessionOpened, ...
+MDC Injection 			MdcInjectionFilter	 	Inject key IoSession properties into the MDC
+Noop 				NoopFilter 			A filter that does nothing. Useful for tests.
+Profiler 			ProfilerTimerFilter 		Profile event messages, like MessageReceived, MessageSent, SessionOpened, ...
+ProtocolCodec 			ProtocolCodecFilter 		A filter in charge of encoding and decoding messages
+Proxy 				ProxyFilter 	 	
+Reference counting 		ReferenceCountingFilter 	Keeps track of the number of usages of this filter
+RequestResponse 		RequestResponseFilter 	 
+SessionAttributeInitializing 	SessionAttributeInitializingFilter 	 
+StreamWrite 			StreamWriteFilter 	 
+SslFilter 			SslFilter 	 
+WriteRequest 			WriteRequestFilter 	
+
+
+ 
+Overriding Events Selectively     //有选择的重写事件
+
+
+You can extend IoAdapter instead of implementing IoFilter directly. Unless overriden, any received events will be forward to the next filter immediately:
+//您可以继承 IoAdapter 而不是 直接实现IoFilter。 除非重载,任何收到事件将立即期待下一个过滤器:
+
+public class MyFilter extends IoFilterAdapter {
+    @Override
+    public void sessionOpened(NextFilter nextFilter, IoSession session) throws Exception {
+        // Some logic here...
+        nextFilter.sessionOpened(session);
+        // Some other logic here...
+    }
+}
+
+Transforming a Write Request	//转换传入请求？
+
+If you are going to transform an incoming write request via IoSession.write(), things can get pretty tricky. For example, let's assume your filter transforms HighLevelMessage to LowLevelMessage when IoSession.write() is invoked with a HighLevelMessage object. You could insert appropriate transformation code to your filter's filterWrite() method and think that's all. However, you have to note that you also need to take care of messageSent event because an IoHandler or any filters next to yours will expect messageSent() method is called with HighLevelMessage as a parameter, because it's irrational for the caller to get notified that LowLevelMessage is sent when the caller actually wrote HighLevelMessage. Consequently, you have to implement both filterWrite() and messageSent() if your filter performs transformation.
+/*
+不要 改变 传入的写入请求 通过IoSession.write(), ===。
+例如, 假设 过滤器将HighLevelMessage 装换成 LowLevelMessage 当在 HighLevelMessage 对象中 调用IoSession.write（）。
+可以 插入适当的转换代码 到 过滤器的的filterWrite()方法。
+然而,必须注意,还需要照顾messageSent事件因为   一个IoHandler或任何过滤器 期望messageSent（）方法 将HighLevelMessage作为参数,
+因为   = = = = = =  BALABALA。
+因此,如果过滤器执行转换，那么必须implement   filterWrite()，messageSent()。
+*/
+
+
+
+Please also note that you still need to implement similar mechanism even if the types of the input object and the output object are identical (e.g. CompressionFilter) because the caller of IoSession.write() will expect exactly what he wrote in his or her messageSent() handler method.
+/*还要注意,咱还需要执行类似的机制,即使输入和输出对象的类型是相同的(例如CompressionFilter)因为IoSession.write（）的调用者将期望在messageSent()处理程序方法里写什么  = =啥啊。
+*/
+
+Let's assume that you are implementing a filter that transforms a String into a char[]. Your filter's filterWrite() will look like the following:
+/假设正在实现一个  将一个字符串转换为一个char[]  的过滤器。你的过滤器filterWrite()方法  应该这样：：：：
+
+public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest request) {
+    nextFilter.filterWrite(
+        session, new DefaultWriteRequest(
+                ((String) request.getMessage()).toCharArray(), request.getFuture(), request.getDestination()));      //= = 崩溃
+}
+
+Now, we need to do the reverse in messageSent():
+//现在,我们需要在messageSent()中做反向:
+
+public void messageSent(NextFilter nextFilter, IoSession session, Object message) {
+    nextFilter.messageSent(session, new String((char[]) message));
+}
+
+What about String-to-ByteBuffer transformation? We can be a little bit more efficient because we don't need to reconstruct the original message (String). However, it's somewhat more complex than the previous example:
+//啥是 String-to-ByteBuffer转换?   可以更有效率,不需要 重建 原始消息（String)。 ,更复杂的例子:
+
+public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest request) {
+    String m = (String) request.getMessage();	
+    ByteBuffer newBuffer = new MyByteBuffer(m, ByteBuffer.wrap(m.getBytes());
+
+    nextFilter.filterWrite(
+            session, new WriteRequest(newBuffer, request.getFuture(), request.getDestination()));
+}
+
+public void messageSent(NextFilter nextFilter, IoSession session, Object message) {
+    if (message instanceof MyByteBuffer) {
+        nextFilter.messageSent(session, ((MyByteBuffer) message).originalValue);
+    } else {
+        nextFilter.messageSent(session, message);
+    }
+}
+
+private static class MyByteBuffer extends ByteBufferProxy {
+    private final Object originalValue;
+    private MyByteBuffer(Object originalValue, ByteBuffer encodedValue) {
+        super(encodedValue);
+        this.originalValue = originalValue;
+    }
+}
+
+If you are using MINA 2.0, it will be somewhat different from 1.0 and 1.1. Please refer to CompressionFilter and RequestResponseFilter meanwhile.
+
+Be Careful When Filtering sessionCreated Event
+///过滤 sessionCreated 事件时 要小心
+
+sessionCreated is a special event that must be executed in the I/O processor thread (see Configuring Thread Model). Never forward sessionCreated event to the other thread.
+//sessionCreated是一个特殊的事件：必须在I / O处理器线程中执行(参考 配置线程模型)。绝不把sessionCreated事件forword给其他线程。
+
+public void sessionCreated(NextFilter nextFilter, IoSession session) throws Exception {
+    // ...
+    nextFilter.sessionCreated(session);
+}
+
+// DON'T DO THIS!
+public void sessionCreated(final NextFilter nextFilter, final IoSession session) throws Exception {
+    Executor executor = ...;
+    executor.execute(new Runnable() {
+        nextFilter.sessionCreated(session);
+        });
+    }
+
+Watch out the Empty Buffers!    //当心  空的缓冲区!
+
+MINA uses an empty buffer as an internal signal at a couple of cases. Empty buffers sometimes become a problem because it's a cause of various exceptions such as IndexOutOfBoundsException. This section explains how to avoid such a unexpected situation.
+//米娜使用空的缓冲区作为一个内部信号的情况。  
+//空缓冲区有时会成为一个问题,因为这将导致各种异常，比如说IndexOutOfBoundsException等。
+//本节解释   如何避免这种难以预料的情况。
+
+ProtocolCodecFilter uses an empty buffer (i.e. buf.hasRemaining() = 0) to mark the end of the message. If your filter is placed before the ProtocolCodecFilter, please make sure your filter forward the empty buffer to the next filter if your filter implementation can throw a unexpected exception if the buffer is empty:
+/*
+ProtocolCodecFilter 用一个空的缓冲区(即buf.hasRemaining()= 0) 来标记的消息结束。
+如果你的过滤器放置在ProtocolCodecFilter之前,请确保你的过滤器 forward 空的缓冲区 到 下一个过滤器过滤 实现 可以抛出一个意想不到的异常，，如果缓冲区为空的话:
+（（94 空的缓冲区 利用的 问题））
+*/
+
+public void messageSent(NextFilter nextFilter, IoSession session, Object message) {
+    if (message instanceof ByteBuffer && !((ByteBuffer) message).hasRemaining()) {
+        nextFilter.messageSent(nextFilter, session, message);
+        return;
+    }
+    ...
+}
+
+public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest request) {
+    Object message = request.getMessage();
+    if (message instanceof ByteBuffer && !((ByteBuffer) message).hasRemaining()) {
+        nextFilter.filterWrite(nextFilter, session, request);
+        return;
+    }
+    ...
+}
+
+Do we always have to insert the if block for every filters? Fortunately, you don't have to. Here's the golden rule of handling empty buffers:
+//我们总是要为每个过滤器插入if块吗?  幸运的是,咱不用。                                       处理 空缓冲区的 黄金法则:
+
+
+    If your filter works without any problem even if the buffer is empty, you don't need to add the if blocks at all.
+	//如果你的过滤器工作没有任何问题,即使缓冲区为空,不需要添加if块
+    If your filter is placed after ProtocolCodecFilter, you don't need to add the if blocks at all.
+	//如果你的过滤器放置ProtocolCodecFilter之后,你不需要添加如果块。
+    Otherwise, you need the if blocks.
+	//否则,你需要if块。
+
+If you need the if blocks, please remember you don't always need to follow the example above. You can check if the buffer is empty wherever you want as long as your filter doesn't throw a unexpected exception.
+
+//如果需要  if块 ,请记住 不总是需要遵循上面的例子 。您可以检查如果缓冲区为空 无论你想只要你的过滤器不抛出一个意想不到的异常。  = =   绕。  94必要时可以不遵守golden rule呗？
+
+
+  #08#14# 家庭聚会 。 #08#15# 补。
+***************************************************************************************************************
+
+
+

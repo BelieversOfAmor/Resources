@@ -1,0 +1,157 @@
+
+		Chapter 4 - Session
+******************************************************************************************************************************************
+
+
+The Session is at the heart of MINA : every time a client connects to the server, a new session is created, and will be kept in memory until the client is disconnected.
+//MINA的核心 Session  ：每次客户端连接到服务器，，都会建立一个新的Session  ，并将保存在内存中，直到 。。。。
+
+A session is used to store persistent informations about the connection, plus any kind of information the server might need to use during the request processing, and eventually during the whole session life.
+//Session 用于储存链接的持久化信息，也储存 所有在服务器处理请求期间 可能需要的信息，，， 整个Session的 生命周期  恩
+
+Session state       
+A session has a state, which will evolve during time.   
+//Scession的 状态 随时间变化
+
+    Connected : the session has been created and is available  //会话创建可用
+    Idle : the session hasn't processed any request for at least a period of time (this period is configurable)//Session至少一段时间（可自定的）没有处理任何请求
+        Idle for read : no read has actually been made for a period of time		// 一段时间没有读取
+        Idle for write : no write has actually been made for a period of time		//一段时时间没有写如
+        Idle for both : no read nor write for a period of time				//一段时间内   没读也没写 = =
+    Closing : the session is being closed (the remaining messages are being flushed, cleaning up is not terminated)  //正在关闭，剩下的消息将被冲掉？清理不终止？
+    Closed : The session is now closed, nothing else can be done to revive it.		//会话已经关闭，，无法恢复。
+
+The following state diagram exposes all the possible states and transitions :     // = =
+
+Configuration		
+
+Many different parameters can be set for a specific session :   //专门为一个Scession设置不同的参数
+
+    receive buffer size		//接收的缓冲区大小
+    sending buffer size		//发送的缓冲区大小
+    Idle time			//闲置时间
+    Write timeOut		//写入超时
+
+plus other configuration, depending on the transport type used (see Chapter 6 - Transports)
+//还有其他配置，，区别于使用的 传输类型 （TCP/UDP。。。）  详见 第六章
+
+
+Managing user-defined attributes
+//管理用户定义的属性
+
+It might be necessary to store some data which may be used later. This is done using the dedicated data structure associated which each session. This is a key-value association, which can store any type of data the developer might want to keep remanent.
+//也许有必要 储存一些以后可能会用到的数据。。这是通过使用（Session专用的）数据结构。这是一个键值对 关联,可以存储任何类型的数据开发人员可能希望保持剩余。
+
+For instance, if you want to track the number of request a user has sent since the session has been created, it's easy to store it into this map: just create a key that will be associated with this value.
+//例如，,如果你想跟踪（自创建会话以来）用户发送的请求数量,，很简单：将它存储到map中:创建一个与此value相关的key就行。
+
+...
+int counterValue = session.getAttribute( "counter" );	//
+session.setAttribute( "counter", counterValue + 1 );	//
+...
+
+We have a way to handle stored Attributes into the session : an Attribute is a key/value pair, which can be added, removed and read from the session's container.
+//我们有一种方法来 存储Attributes 到会话:属性是一个 键/值对 ,可以从会话和阅读的容器中 添加,删除。
+
+This container is created automatically when the session is created, and will be disposed when the session is terminated.
+//Scession创建时会自动创建 容器,会话终止时将处理（自动）被处理。       ！！！  怪不得叫MINA的心脏     #### 
+ 
+Defining the container
+
+As we said, this container is a key/value container, which default to a Map, but it's also possible to define another data structure if one want to handle long lived data, or to avoid storing all those data in memory if they are large : we can implement an interface and a factory that will be used to create this container when the session is created.
+/*     这个容器是一个 键/值 容器,默认Map, 当然它也可以定义成别的 数据结构 , 如果去一个想处理长生命周期的数据的话, 或为了 避免在内存中存储所有的数据,如果他们都很大:我们可以实现一个接口和一个factory, 将被用于创建这个容器创建会话时。       ///////  zanshi用不大着 ，，，   
+ */
+
+This snippet of code shows how the container is created during the session initialization :
+//代码片段       展示了如何  在会话 初始化 时 创建 容器:
+
+protected final void initSession(IoSession session,
+        IoFuture future, IoSessionInitializer sessionInitializer) {
+    ...
+    try {
+        ((AbstractIoSession) session).setAttributeMap(session.getService()
+                .getSessionDataStructureFactory().getAttributeMap(session));
+    } catch (IoSessionInitializationException e) {
+        throw e;
+    } catch (Exception e) {
+        throw new IoSessionInitializationException(
+                "Failed to initialize an attributeMap.", e);
+    }
+    ...
+
+and here is the factory interface we can implement if we want to define another kind of container :
+//  定义另一种容器的方法 ，，，暂时不需要 = =
+
+public interface IoSessionDataStructureFactory {
+    /**
+     * Returns an {@link IoSessionAttributeMap} which is going to be associated
+     * with the specified <tt>session</tt>.  Please note that the returned
+     * implementation must be thread-safe.
+     */
+     IoSessionAttributeMap getAttributeMap(IoSession session) throws Exception;
+ }
+
+
+Filter chain          //过滤器链
+
+Each session is associated with a chain of filters, which will be processed when an incoming request or an outgoing message is received or emitted. Those filters are specific for each session individually, even if most of the cases, we will use the very same chain of filters for all the existing sessions.
+/*每个会都会关联 一连串的过滤器,  用来处理（传入请求、一个 outgoing = =的消息）的接收或发送。这些过滤器是为每个单独的的 会话特定的,即使大多数的情况下,我们将使用类似的过滤器链 。
+ */
+
+However, it's possible to dynamically modify the chain for a single session, for instance by adding a Logger Filter in the chain for a specific session.
+//然而,它可以动态地修改单个会话的 过滤器链,                     例如    为一个特定的session 添加 日志过滤器 到 过滤器链中 。
+
+Statistics   //统计数据
+
+
+Each session also keep a track of records about what has been done for the session :
+//每个session 也持续的 跟踪    记录对session做了什么    ლ(╹◡╹ლ) ：
+
+
+    number of bytes received/sent	//    接收/发送的字节数
+    number of messages received/sent	//    接收/发送的消息数量
+    Idle status				//    空闲状态
+    throughput				//    吞吐量
+
+and many other useful informations.	//    和许多其他 有用的信息。
+Handler		//处理程序
+
+Last, not least, a session is attached to a Handler, in charge of dispatching the messages to your application. This handler will also send pack response by using the session, simply by calling the write() method :
+// 最后,同样重要的是, 
+//一个session 附加到处理程序,  负责调度信息到 应用程序。这个处理程序也将通过session 发送 数据包 响应 , 只是 通过调用write()方法:
+
+...
+session.write( <your message> );
+...
+
+***********************************************************************************************************************************************
+***********************************************************************************************************************************************
+/*
+MINA的Session部分整理完了，，
+今天去MINA官网，把 官方做的一个聊天室 整理到自己的Eclipse 里了，，，并且 buildpath 导入包 什么什么的全部解决，，也就是能跑了，，，
+其间，仅被动（因为代码出错了不得不该） 修改了代码的一部分，根据修改提示的第二个办法，把
+class SwingChatClient
+implements Callback, apache_chat_Client.SwingChatClientHandler.Callback
+
+。。接口里加了个apache_chat_Client.SwingChatClientHandler.Callback      
+    不加编译不通过
+
+  查了查资料  about 回调函数  = =  目前不理解。。 打个 ？ 
+
+。。  ------
+  对照着 user guide 和 聊天室的例子  还有 API  使劲消化把哈，反正时间也不多了。
+
+ 贴上网址：
+	  -user guide URL：
+	  -Chat 源代码URL：http://mina.apache.org/mina-project/xref/org/apache/mina/example/chat/
+	  +API URL   -源代码式的 http://mina.apache.org/mina-project/xref/index.html		
+		     -详细介绍的 http://mina.apache.org/mina-project/apidocs/index.html	
+
+
+( 哦对，session.close();方法被弃用了，，，难道 MINA接手自动管理资源释放了？？？  加个？ ）
+
+ #2016#08#13#  21:21   
+*********************************************************************************************************************************************
+
+
+

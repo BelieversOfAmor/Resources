@@ -1,0 +1,144 @@
+11111111111
+
+/*
+ *师从 Apache MINA User Guide
+ *第一步，放一个框架
+ */
+public class MinaTimeServer{
+	public static void main(String[] args){
+		//code hehahadasdada			
+	}
+}
+
+22222222222222222222
+/*
+ *师从 Apache MINA User Guide
+ *第一步，放一个框架;
+ *第二步，new 一个对象，用于监听客户端的链接;
+ */
+import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
+
+public class MinaTimeServer{
+	public static void main(String[] args){
+
+		IoAcceptor acceptor = new NioSocketAcceptor;
+
+	}
+}
+
+33333333333333333333333333
+/*
+ *师从 Apache MINA User Guide
+ *第一步，放一个框架;
+ *第二步，new 一个对象，用于监听客户端的链接;
+ *第三步，继续 new 一个 handler class ，然后绑定到一个端口;
+ */
+import java.net.InetSocketAddress;
+
+import org.apache.mina.core.service.IoAcceptor;
+import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
+
+public class MinaTimeServer{
+	private static final int PORT = 38324;
+	public static void main(String[] args){
+
+		IoAcceptor acceptor = new NioSocketAcceptor;
+		acceptor.bind(new InetSocketAddress(PORT));
+	}
+}
+
+4444444444444444444444444444444444444444444444444444444444444444
+/*
+ *师从 Apache MINA User Guide
+ *第一步，放一个框架;
+ *第二步，new 一个对象，用于监听客户端的链接;
+ *第三步，继续 new 一个 handler class ，然后绑定到一个端口;
+ *第四步，为配置添加一个过滤器，用来记录所有信息。。第二个过滤器将二进制或协议特定的数据转化为 消息对象，（使用现有的TextLine工厂，自动处理文本）
+ */
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.nio.charset.Charset;
+
+import org.apache.mina.core.service.IoAcceptor;
+import org.apache.mina.filter.codec.ProtocolCodecFilter;
+inport org.apache.mina.filter.codec.textline.TextLineCodecFactory;
+import org.apache.mina.filter.logging.LoggingFilter;
+import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
+
+public class MinaTimeServer{
+	private static final int PORT = 38324;
+	public static void main(String[] args){
+		
+		IoAcceptor acceptor = new NioSocketAcceptor;
+		acceptor.getFilterChain().addLast("logger",new LoggingFilter());
+		accepter.getFilterChain().addLast("codec",new ProtocolCodecFilter(new TextLineCodeFactory(Charset.forName("UTF-8"))));
+		 // 自动处理基础文本信息(不必编写编解码器);
+		acceptor.bind(new InetSocketAddress(PORT));
+	}
+}
+
+
+555555555555555555555555555555555555555555555555555555555555555555555
+
+/*
+ *师从 Apache MINA User Guide
+ *第一步，放一个框架;
+ *第二步，new 一个对象，用于监听客户端的链接;
+ *第三步，继续 new 一个 handler class ，然后绑定到一个端口;
+ *第四步，为配置添加一个过滤器，用来记录所有信息。。第二个过滤器将二进制或协议特定的数据转化为 消息对象，（使用现有的TextLine工厂，自动处理文本）
+ *第五步，定义一个处理程序，用于接受客户端链接请求的当前时间。
+ */
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.nio.charset.Charset;
+
+import org.apache.mina.core.service.IoAcceptor;
+import org.apache.mina.filter.codec.ProtocolCodecFilter;
+inport org.apache.mina.filter.codec.textline.TextLineCodecFactory;
+import org.apache.mina.filter.logging.LoggingFilter;
+import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
+
+public class MinaTimeServer{
+	private static final int PORT = 38324;
+	public static void main(String[] args){
+		
+		IoAcceptor acceptor = new NioSocketAcceptor;
+		acceptor.getFilterChain().addLast("logger",new LoggingFilter());
+		accepter.getFilterChain().addLast("codec",new ProtocolCodecFilter(new TextLineCodeFactory(Charset.forName("UTF-8"))));
+		 // 自动处理基础文本信息(不必编写编解码器);
+		acceptor.bind(new InetSocketAddress(PORT));
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

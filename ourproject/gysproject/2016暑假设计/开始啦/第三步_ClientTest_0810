@@ -1,0 +1,202 @@
+111111111111111111111111111111111111111111111
+					    1
+/*
+ *师从Apache MINA User Giuder
+ *
+ */
+
+package oo;
+
+import java.net.InetSocketAddress;
+
+import org.apache.mina.core.RuntimeIoException;
+import org.apache.mina.core.future.ConnectFuture;
+import org.apache.mina.core.service.IoHandler;
+import org.apache.mina.core.session.IoSession;
+import org.apache.mina.example.sumup.ClientSessionHandler;
+import org.apache.mina.example.sumup.codec.SumUpProtocolCodecFactory;
+import org.apache.mina.filter.codec.ProtocolCodecFilter;
+import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
+import org.apache.mina.filter.logging.LoggingFilter;
+import org.apache.mina.transport.socket.nio.NioSocketConnector;
+
+
+public class Client {
+	public static void main(String[] args) throws Throwable {
+		final String HOSTNAME = "localhost";
+		final int PORT = 8080;
+		final long CONNECT_TIMEOUT = 30*1000L; // 30 seconds
+		// Set this to false to use object serialization instead of custom coded.
+		final boolean USE_CUSTOM_CODEC = true;
+		
+		if (args.length == 0){
+			System.out.println("请输入");
+			//return;    不能 return  ,否咋不行 why?
+		}
+		
+		// 定义 values 数组 用来求和
+		int[] values = new int[args.length];
+		for (int i=0;i<args.length;i++){
+			values[i] = Integer.parseInt(args[i]);
+		}
+		//Create a Connector
+		NioSocketConnector connector = new NioSocketConnector();
+		connector.setConnectTimeoutMillis(CONNECT_TIMEOUT);
+		
+		//Create a Filter Chain
+		if(USE_CUSTOM_CODEC)	{
+			connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new SumUpProtocolCodecFactory(false)));
+			}
+		else{
+			connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new ObjectSerializationCodecFactory()));
+			
+		}
+		
+		connector.getFilterChain().addLast("logger",new LoggingFilter());
+		
+		//Create IOHandler  创建一个ClientSessionHandler实例，作为Connector处理程序。
+		connector.setHandler((IoHandler) new ClientSessionHandler(values));
+		
+		//Bind to Server
+		IoSession session;
+		
+		for(;;){
+			try{
+				ConnectFuture future = connector.connect(new InetSocketAddress(HOSTNAME,PORT));
+				future.awaitUninterruptibly();
+				session = future.getSession();
+				break;
+			}catch(RuntimeIoException e){
+				System.err.println("Failed to connect.");
+				e.printStackTrace();
+				Thread.sleep(5000);
+			}
+		}
+		
+		//wait until the summation is done     
+		
+		session.getCloseFuture().awaitUninterruptibly();
+		connector.dispose();
+		
+	}
+}
+
+
+/*   #2016#08#11# 18:02 
+服务器一直跳，IDLE 1   ，， IDLE  2 ，，   why ?              
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+ *Apache 源代码
+ */
+
+
+1   /*
+2    *  Licensed to the Apache Software Foundation (ASF) under one
+3    *  or more contributor license agreements.  See the NOTICE file
+4    *  distributed with this work for additional information
+5    *  regarding copyright ownership.  The ASF licenses this file
+6    *  to you under the Apache License, Version 2.0 (the
+7    *  "License"); you may not use this file except in compliance
+8    *  with the License.  You may obtain a copy of the License at
+9    *
+10   *    http://www.apache.org/licenses/LICENSE-2.0
+11   *
+12   *  Unless required by applicable law or agreed to in writing,
+13   *  software distributed under the License is distributed on an
+14   *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+15   *  KIND, either express or implied.  See the License for the
+16   *  specific language governing permissions and limitations
+17   *  under the License.
+18   *
+19   */
+20  package org.apache.mina.example.sumup;
+21  
+22  import java.net.InetSocketAddress;
+23  
+24  import org.apache.mina.core.RuntimeIoException;
+25  import org.apache.mina.core.future.ConnectFuture;
+26  import org.apache.mina.core.session.IoSession;
+27  import org.apache.mina.example.sumup.codec.SumUpProtocolCodecFactory;
+28  import org.apache.mina.filter.codec.ProtocolCodecFilter;
+29  import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
+30  import org.apache.mina.filter.logging.LoggingFilter;
+31  import org.apache.mina.transport.socket.nio.NioSocketConnector;
+32  
+33  /**
+34   * (<strong>Entry Point</strong>) Starts SumUp client.
+35   *
+36   * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+37   */
+38  public class Client {
+39      private static final String HOSTNAME = "localhost";
+40  
+41      private static final int PORT = 8080;
+42  
+43      private static final long CONNECT_TIMEOUT = 30*1000L; // 30 seconds
+44  
+45      // Set this to false to use object serialization instead of custom codec.
+46      private static final boolean USE_CUSTOM_CODEC = true;
+47  
+48      public static void main(String[] args) throws Throwable {
+49          if (args.length == 0) {
+50              System.out.println("Please specify the list of any integers");
+51              return;
+52          }
+53  
+54          // prepare values to sum up
+55          int[] values = new int[args.length];
+56          for (int i = 0; i < args.length; i++) {
+57              values[i] = Integer.parseInt(args[i]);
+58          }
+59  
+60          NioSocketConnector connector = new NioSocketConnector();
+61  
+62          // Configure the service.
+63          connector.setConnectTimeoutMillis(CONNECT_TIMEOUT);
+64          if (USE_CUSTOM_CODEC) {
+65              connector.getFilterChain().addLast(
+66                      "codec",
+67                      new ProtocolCodecFilter(
+68                              new SumUpProtocolCodecFactory(false)));
+69          } else {
+70              connector.getFilterChain().addLast(
+71                      "codec",
+72                      new ProtocolCodecFilter(
+73                              new ObjectSerializationCodecFactory()));
+74          }
+75          connector.getFilterChain().addLast("logger", new LoggingFilter());
+76  
+77          connector.setHandler(new ClientSessionHandler(values));
+78  
+79          IoSession session;
+80          for (;;) {
+81              try {
+82                  ConnectFuture future = connector.connect(new InetSocketAddress(
+83                          HOSTNAME, PORT));
+84                  future.awaitUninterruptibly();
+85                  session = future.getSession();
+86                  break;
+87              } catch (RuntimeIoException e) {
+88                  System.err.println("Failed to connect.");
+89                  e.printStackTrace();
+90                  Thread.sleep(5000);
+91              }
+92          }
+93  
+94          // wait until the summation is done
+95          session.getCloseFuture().awaitUninterruptibly();
+96          
+97          connector.dispose();
+98      }
+99  }

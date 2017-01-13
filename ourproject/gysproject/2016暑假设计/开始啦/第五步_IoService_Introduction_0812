@@ -1,0 +1,342 @@
+  	
+			IoService Introduction
+
+	#2016#08#12#  ,深入学习，细节展开 ，by Morpheus
+**********************************************************************************
+/*  源自 apache user guide    
+
+ * 自个 翻译理解、综合记忆
+
+Responsabilities
+
+As seen in the previous graphic, The IoService has many responsabilities :
+		
+    sessions management : Creates and deletes sessions, detect idleness.
+	//会话管理器：创建 删除会话，监察闲置（会话。
+    filter chain management : Handles the filtr chain, allowing the user to change the chain on the fly
+	//过滤器链管理器：处理过滤器链，允许用户在运行中改变链。
+    handler invocation : Calls the handler when some new message is received, etc
+	//处理程序调用：接收消息时，调用处理程序 等等。
+    statistics management : Updates the number of messages sent, bytes sent, and many others
+	//统计管理器：更新消息、字节等的发送数量。
+    listeners management : Manages the Listeners a suer can set up
+	//监听器管理器：管理用户建立的监听器。
+    communication management : Handles the transmission of data, in both side
+	//对话管理器：处理数据的传输，在两端（客户端、服务端）。
+
+
+All those aspects will be described in the following chapters.
+
+
+Interface Details
+
+IoService is the base interface for all the IoConnector's and IoAcceptor's that provides I/O services and manages I/O sessions. The interface has all the functions need to perform I/O related operations.
+	
+	//IoService是IoConnector和IoAcceptor的基础，负责提供I / O服务和管理I / O会话。这个接口有所有需要执行相关的I / O操作的功能（函数、亦 方法）。
+
+Lets take a deep dive into the various methods in the interface
+
+    getTransportMetadata()
+    addListener()
+    removeListener()
+    isDisposing()
+    isDisposed()
+    dispose()
+    getHandler()
+    setHandler()
+    getManagedSessions()
+    getManagedSessionCount()
+    getSessionConfig()
+    getFilterChainBuilder()
+    setFilterChainBuilder()
+    getFilterChain()
+    isActive()
+    getActivationTime()
+    broadcast()
+    setSessionDataStructureFactory()
+    getScheduledWriteBytes()
+    getScheduledWriteMessages()
+    getStatistics()
+
+getTransportMetadata();
+This method returns the Transport meta-data the IoAcceptor or IoConnector is running. The typical details include provider name (nio, apr, rxtx), connection type (connectionless/connection oriented) etc.
+//该方法返回传输IoAcceptor或IoConnector运行中的元数据。典型的细节包括来源名称(nio,apr,rxtx),连接类型(connectionless/connection oriented)等。
+
+addListener();
+Allows to add a IoServiceListener to listen to specific events related to IoService.
+//允许添加IoServiceListener去监听与IoService相关的特定事件。
+
+removeListener();
+Removes specified IoServiceListener attached to this IoService.
+//移除附属于IoService的指定的IoServiceListener。
+
+isDisposing();
+This method tells if the service is currently being disposed. As it can take a while, it's useful to know the current status of the service.
+//这个方法告诉我们服务器当前是否正在处理。可能需要一段时间,对于了解服务的当前状态是有用的。
+
+isDisposed();
+This method tells if the service has been disposed. A service will be considered as disposed only when all the resources it has allocated have been released.
+//这个方法告诉我们服务是否已经处理完了。只有当所有已分配的资源都被释放，这个服务才被视为处理完成的。
+
+dispose();
+This method releases all the resources the service has allocated. As it may take a while, the user should check the service status using the isDisposing() and isDisposed() to know if the service is now disposed completely.
+//这种方法释放所有为一个服务分配的资源。因为它可能需要一段时间,用户应该检查服务状态，利用用 isDisposing()和isDisposed() 来确定一个服务是否处理完成。
+
+Always call dispose() when you shutdown a service !
+//当你关闭一个服务的时候，要总是调用dispose()；!
+
+getHandler();
+Returns the IoHandler associated with the service.
+//返回IoHandler相关服务。
+
+setHandler();
+Sets the IoHandler that will be responsible for handling all the events for the service. The handler contains your application logic !
+//设置IoHandler，去（为一个服务）负责处理所有的事件。handler包含你的应用程序逻辑!
+
+getManagedSessions();
+Returns the map of all sessions which are currently managed by this service. A managed session is a session which is added to the service listener. It will be used to process the idle sessions, and other session aspects, depending on the kind of listeners a user adds to a service.
+//返回目前由该服务管理的所有的会话的map。一个会话管理是一个一个添加到服务中的监听器会话。它将用于处理闲置会话,和会话的其他方面,取决于一个用户添加到服务的监听器。
+
+getManagedSessionCount();
+Returns the number of all sessions which are currently managed by this service.
+//返回目前由该服务管理的所有会话的数量。
+
+getSessionConfig();
+Returns the session configuration.
+//返回会话的配置
+
+getFilterChainBuilder();
+Returns the Filter chain builder. This is useful if one wants to add some new filter that will be injected when the sessions will be created.
+//返回过滤器链的构建器。当一个会话将要被创建时，如果想添加一些将要被注入的新的过滤器，那这个方法就会有帮助。
+
+setFilterChainBuilder();
+Defines the Filter chain builder to use with the service.
+//定义过滤器链构建器去用（带服务）。
+
+getFilterChain();
+Returns the current default Filter chain for the service.
+//返回当前服务的默认过滤器链。
+
+isActive();
+Tells if the service is active or not.
+//告诉我们服务是否活跃
+
+getActivationTime();
+Returns the time when this service was activated. It returns the last time when this service was activated if the service is not anymore active.
+//当这个服务被激活时，返回时间。它返回这个服务最后被激活的时间,如果这个服务再也不活跃。
+
+broadcast();	//广播();
+Writes the given message to all the managed sessions.
+//写消息给所有的会话管理。
+
+setSessionDataStructureFactory();
+Sets the IoSessionDataStructureFactory that provides related data structures for a new session created by this service.
+//这个服务创建一个新会话时，为这个服务设置IoSessionDataStructureFactory提供相关数据结构。
+
+getScheduledWriteBytes();
+Returns the number of bytes scheduled to be written (ie, the bytes stored in memory waiting for the socket to be ready for write).
+//返回将写入的字节数(即字节存储在内存等待socket写入)。
+
+getScheduledWriteMessages();
+Returns the number of messages scheduled to be written (ie, the messages stored in memory waiting for the socket to be ready for write).
+//返回将要被写入的消息数量(即消息存储在内存中等待socket写入)。
+
+getStatistics();
+Returns the IoServiceStatistics object for this service.
+//为这个服务返回IoServiceStatistics对象.
+
+
+*/
+*********************************************************************************************************
+
+************************************************ IoService Details **************************************
+													
+									
+	IoService Details
+
+IoService is an interface that is implemented by the two most important classes in MINA :
+
+    IoAcceptor
+    IoConnector
+
+
+In order to build a server, you need to select an implementation of the IoAcceptor interface. For client applications, you need to implement an implementation of the IoConnector interface.
+
+
+
+IoAcceptor
+
+Basically, this interface is named because of the accept() method, responsible for the creation of new connections between a client and the server. The server accepts incoming connection requests.
+//这个接口命名是因为accept()方法,负责创建新的（客户端和服务器之间的）连接。服务器接受传入的连接请求。
+
+At some point, we could have named this interface 'Server' (and this is the new name in the coming MINA 3.0).
+//在某种程度上,我们可以把这个接口叫做‘服务器’(这是新名称在未来米娜3.0)
+
+As we may deal with more than one kind of transport (TCP/UDP/...), we have more than one implementation for this interface. It would be very unlikely that you need to implement a new one.
+//我们可能处理超过各种传输(TCP / UDP /…),我们有不止一个这个接口的实现。很可能你需要实现一个新的。
+
+We have many of those implementing classes
+
+    NioSocketAcceptor : the non-blocking Socket transport IoAcceptor 		//非阻塞socket传输
+    NioDatagramAcceptor : the non-blocking UDP transport IoAcceptor		//非阻塞UDP传输
+    AprSocketAcceptor : the blocking Socket transport IoAcceptor, based on APR	//阻塞式socket传输，基于APR
+    VmPipeSocketAcceptor : the in-VM IoAcceptor					//管道通讯？
+
+Just pick the one that fit your need.
+
+Here is the class diagram for the IoAcceptor interfaces and classes :		//在别的地方
+
+IoConnector
+
+As we have to use an IoAcceptor for servers, you have to implement the IoConnector for clients. Again, we have many implementation classes :
+
+    NioSocketConnector : the non-blocking Socket transport IoConnector		//非阻塞socket传输
+    NioDatagramConnector : the non-blocking UDP transport IoConnector		//非阻塞UDP传输
+    AprSocketConnector : the blocking Socket transport IoConnector, based on APR//阻塞socket传输，基于APR
+    ProxyConnector : a IoConnector providing proxy support			//提供代理
+    SerialConnector : a IoConnector for a serial transport			//串行传输
+    VmPipeConnector : the in-VM IoConnector					//管道传输？？
+
+Just pick the one that fit your need.
+
+Here is the class diagram for the IoConnector interfaces and classes :		//在别的地方
+
+*********************************************** IoService Details ****************************************************
+
+************************************************** Acceptor **********************************************************
+
+Acceptor
+
+In order to build a server, you need to select an implementation of the IoAcceptor interface.
+IoAcceptor
+//为了建立一个服务器，我们需要选择实现一个IoAcceptor接口  ， ， ，  _(:з」∠)_   (╥_╥)    ( ´∀`)σ)Д`)        呦，输入法还能这样玩这样玩 
+
+Basically, this interface is named because of the accept() method, responsible for the creation of new connection between a client and the server. The server accepts incoming connection request.
+//同上
+
+At some point, we could have named this interface 'Server'.
+
+As we may deal with more than one kind of transport (TCP/UDP/...), we have more than one implementation for this interface. It would be very unlikely that you need to implement a new one.
+
+We have many of those implementing classes
+
+    NioSocketAcceptor : the non-blocking Socket transport IoAcceptor		//已经出现过
+    NioDatagramAcceptor : the non-blocking UDP transport IoAcceptor
+    AprSocketAcceptor : the blocking Socket transport IoAcceptor, based on APR
+    VmPipeSocketAcceptor : the in-VM IoAcceptor
+
+Just pick the one that fit your need.
+
+Here is the class diagram for the IoAcceptor interfaces and classes :   //  = =
+
+
+
+Creation      //创建
+
+You first have to select the type of IoAcceptor you want to instanciate. This is a choice you will made early in the process, as it all boils down to which network protocol you will use. Let's see with an example how it works :
+//首先选择一个你想实例化的接口类型  （instantiated 一定是的）。在过程中，这个较早作出的选择 来自接下来将要使用的 网络协议。恩
+
+
+public TcpServer() throws IOException {
+    // Create a TCP acceptor
+    IoAcceptor acceptor = new NioSocketAcceptor();        		  //子类构造器实例化的父类 对象 （非阻塞socket）
+
+    // Associate the acceptor to an IoHandler instance (your application)
+    acceptor.setHandler(this);						  //setHandler（）   Method to 处理事件
+
+    // Bind : this will start the server...
+    acceptor.bind(new InetSocketAddress(PORT));				  //绑定到端口   （一个新的 InetSocketAddress 对象）
+
+    System.out.println("Server started...");				  // 。。。
+}
+
+That's it ! You have created a TCP server. If you want to start an UDP server, simply replace the first line of code :
+//创建一个TCP 服务器，，，要想弄一个UDP的，，把第一行代码改了就行
+
+
+...
+// Create an UDP acceptor
+IoAcceptor acceptor = new NioDatagramAcceptor();   			   //非阻塞UDP传输
+...
+
+Disposal	//处理
+
+The service can be stopped by calling the dispose() method. The service will be stopped only when all the pending sessions have been processed :
+// 服务可以通过调用 dispose（） 方法停止   。  服务 将 仅 当所有等待中的会话被处理完 才停止
+
+// Stop the service, waiting for the pending sessions to be inactive
+acceptor.dispose();              //所有等待中的会话不再活跃的时候 停止服务器
+
+You can also wait for every thread being executed to be properly completed by passing a boolean parameter to this method :
+//你也可以等到所有正在执行的线程 正确完成之后 传递一个 boolean 参数 给这个方法
+
+// Stop the service, waiting for the processing session to be properly completed
+acceptor.dispose( true );     //线程，传参
+
+Status		// 状态
+
+You can get the IoService status by calling one of the following methods :
+//可以通过调用以下方法，得到服务的状态
+
+    isActive() : true if the service can accept incoming requests 
+	//ture  当可以接受传入请求时 为 真
+    isDisposing() : true if the dispose() method has been called. It does not tell if the service is actually stopped (some sessions might be processed)
+	//ture  当dispose()方法被调用。     他是并没有告诉我们服务时候确实停止了（有些sessions可能被处理）
+    isDisposed() : true if the dispose(boolean) method has been called, and the executing threads have been completed.
+	//ture  当 dispose(boolean)方法被调用，线程执行完成
+
+Managing the IoHandler  //管理IoHandler
+
+You can add or get the associated IoHandler when the service has been instanciated. Youjust have to call the setHandler(IoHandler) or getHandler() methods.
+
+//您可以add或get相关的IoHandler 当服务创建一个实例后。必须调用setHandler(IoHandler)或那么getHandler()方法。
+
+Managing the Filters chain     //管理 过滤器链
+if you want to manage the filters chain, you will have to call the getFilterChain() method. Here is an example :
+//   你必须调用 getFilterChain() 
+
+// Add a logger filter
+DefaultIoFilterChainBuilder chain = acceptor.getFilterChain();  //将一个默认的IoFilterChain 实例化 ，在用getFilterChain)()初始化 
+chain.addLast("logger", new LoggingFilter());
+
+You can also create the chain before and set it into the service :
+
+// Add a logger filter
+DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
+chain.addLast("logger", new LoggingFilter());
+
+// And inject the created chain builder in the service
+acceptor.setFilterChainBuilder(chain);
+
+//          也可以先用构造器 NEW一个对象，再调用setFilterChainBuilder()的带参方法，把chain 传进去。。。
+
+****************************************************** Acceptor ***************************************
+
+
+***************************************************** Connector ***************************************
+	Connector	//连接器
+
+For client applications, you need to implement an implementation of the IoConnector interface.
+IoConnector
+
+As we have to use an IoAcceptor for servers, you have to implement the IoConnector. Again, we have many implementation classes :
+//服务器必须 实现 IoConnector 接口
+
+										  //同上～
+    NioSocketConnector : the non-blocking Socket transport Connector		  //非阻塞socket传输 
+    NioDatagramConnector : the non-blocking UDP transport * Connector*		  //非阻塞UDP传输 连接器  带引号？
+    AprSocketConnector : the blocking Socket transport * Connector*, based on APR //阻塞socket传输 
+    ProxyConnector : a Connector providing proxy support			  //提供代理支持
+    SerialConnector : a Connector for a serial transport			  //串行传输
+    VmPipeConnector : the in-VM * Connector*					  //呃。。忘了。。管道传输？
+
+Just pick the one that fit your need.                                             // 按需 选其一
+
+Here is the class diagram for the IoConnector interfaces and classes :   // 在别处
+
+*********************************************** Connector *********************************************
+/*  通过这些知识点，才更能渗透理解MINA到底是个啥子 。。。
+
+ @Morpheus && @Apache User Guide          #08#12#  21:57  
+ */
+

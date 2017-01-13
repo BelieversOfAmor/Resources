@@ -1,0 +1,599 @@
+	root@kali-vivian:~# ssh-keygen -t rsa -C “1160139211@qq.com”
+Generating public/private rsa key pair.
+Enter file in which to save the key (/root/.ssh/id_rsa): 
+Created directory '/root/.ssh'.
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /root/.ssh/id_rsa.
+Your public key has been saved in /root/.ssh/id_rsa.pub.
+The key fingerprint is:
+SHA256:e6CfezzonLNUKQ34xnYDHt+hqBgvJPuiuVMj3ZdEAyo “1160139211@qq.com”
+The key's randomart image is:
++---[RSA 2048]----+
+|    ..           |
+|   .  o.         |
+|E .  ...+   .    |
+| .    .+ B + .   |
+| ...o. .S O .    |
+|. ++.+o= * .     |
+| o..o.+ oo.      |
+|.... . +o++      |
+|++ ..  .O= .     |
++----[SHA256]-----+
+	root@kali-vivian:~# cd .ssh
+	root@kali-vivian:~/.ssh# ls
+id_rsa  id_rsa.pub
+	root@kali-vivian:~/.ssh# cat id_rsa.pub 
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC1pIg4Awa3lZEInBA/HmRi+6GMNP8Ifx8lSaFU0T0DiAjEeUQH37pkSpHtVTvO6K6ylvvmVpxtiHFk5nq9YKo0YIo7hk1cxAVHAq23WwiNQLzVpQxMeJiO88gkGGOh6GRRQ83Jr3WKyzVGC8dW3YTti/rFQIoGUMUrv6nqaE6tLy5m0LyA0/0SU/K4Z0E8fAXw3kd219Mk5dSd4VgEyPAVlNpu7YdlHpHeZYmD/cAAZO2tMEW43e1vheWBaaTDBUocfJ58Au/vESHtJ7LU+LEh/Ig5GO9a2oA+DEuaGgZU79RHzc8u7VIhleqCJrGBK3qmx21yZNm35WI+fbGflexl “1160139211@qq.com”
+	root@kali-vivian:~/.ssh# cd
+	root@kali-vivian:~# mkdir learngit
+	root@kali-vivian:~# cd learngit/
+	root@kali-vivian:~/learngit# git init
+初始化空的 Git 仓库于 /root/learngit/.git/
+	root@kali-vivian:~/learngit# touch test
+	root@kali-vivian:~/learngit# ls
+test
+	root@kali-vivian:~/learngit# git add .
+	root@kali-vivian:~/learngit# git commit -m "7.30"
+[master（根提交） ca18fdf] 7.30
+ Committer: root <root@localhost.localdomain>
+您的姓名和邮件地址基于登录名和主机名进行了自动设置。请检查它们正确
+与否。您可以对其进行设置以免再出现本提示信息。运行如下命令在编辑器
+中编辑您的配置文件：
+
+    git config --global --edit
+
+设置完毕后，您可以用下面的命令来修正本次提交所使用的用户身份：
+
+    git commit --amend --reset-author
+
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 test
+	root@kali-vivian:~/learngit# git remote add test git@softlab.sdut.edu.cn:gaoyisheng/233.git
+	root@kali-vivian:~/learngit# git push -u test master
+The authenticity of host 'softlab.sdut.edu.cn (211.64.28.57)' can't be established.
+ECDSA key fingerprint is SHA256:SddS/tQ2GWWFkFLA14n9CVDkmql6v/xRGw7/QVuRA78.
+Are you sure you want to continue connecting (yes/no)? tes
+Please type 'yes' or 'no': yes
+Warning: Permanently added 'softlab.sdut.edu.cn,211.64.28.57' (ECDSA) to the list of known hosts.
+
+
+
+
+对象计数中: 3, 完成.
+写入对象中: 100% (3/3), 200 bytes | 0 bytes/s, 完成.
+Total 3 (delta 0), reused 0 (delta 0)
+To git@softlab.sdut.edu.cn:gaoyisheng/233.git
+ * [new branch]      master -> master
+分支 master 设置为跟踪来自 test 的远程分支 master。
+	root@kali-vivian:~/learngit# 
+root@kali-vivian:~/learngit# 
+root@kali-vivian:~/learngit# 
+root@kali-vivian:~/learngit# 
+	root@kali-vivian:~/learngit# touch head
+	root@kali-vivian:~/learngit# git add .
+	root@kali-vivian:~/learngit# git commit -m "fgiodsa"
+[master 107d60b] fgiodsa
+ Committer: root <root@localhost.localdomain>
+您的姓名和邮件地址基于登录名和主机名进行了自动设置。请检查它们正确
+与否。您可以对其进行设置以免再出现本提示信息。运行如下命令在编辑器
+中编辑您的配置文件：
+
+    git config --global --edit
+
+设置完毕后，您可以用下面的命令来修正本次提交所使用的用户身份：
+
+    git commit --amend --reset-author
+
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 head
+	root@kali-vivian:~/learngit# git push test master
+对象计数中: 2, 完成.
+Delta compression using up to 4 threads.
+压缩对象中: 100% (2/2), 完成.
+写入对象中: 100% (2/2), 232 bytes | 0 bytes/s, 完成.
+Total 2 (delta 0), reused 0 (delta 0)
+To git@softlab.sdut.edu.cn:gaoyisheng/233.git
+   ca18fdf..107d60b  master -> master
+	root@kali-vivian:~/learngit# 
+
+
+
+
+
+
+
+
+
+
+***************************************** #2016#08#07#  MINA第一步 ***************************
+											     *
+root@kali-vivian:~# cd /learngit							     *	
+bash: cd: /learngit: 没有那个文件或目录
+root@kali-vivian:~# ls
+air.txt       cap-01.kismet.csv     HelloWorld.class  learngit   视频  音乐
+autosave.xmi  cap-01.kismet.netxml  HelloWorld.java   workspace  图片  桌面
+cap-01.cap    doc                   leapyear.class    公共       文档
+cap-01.csv    hello.class           leapyear.java     模板       下载
+root@kali-vivian:~# cd learngit/
+root@kali-vivian:~/learngit# touch MINA第一步
+root@kali-vivian:~/learngit# git add.
+git：'add.' 不是一个 git 命令。参见 'git --help'。
+
+您指的是这个么？
+	add
+root@kali-vivian:~/learngit# git add .
+root@kali-vivian:~/learngit# git commit -m "#2016#08#07#,by Morpheus"
+[master 5e664e8] #2016#08#07#,by Morpheus
+ Committer: root <root@localhost.localdomain>
+您的姓名和邮件地址基于登录名和主机名进行了自动设置。请检查它们正确
+与否。您可以对其进行设置以免再出现本提示信息。运行如下命令在编辑器
+中编辑您的配置文件：
+
+    git config --global --edit
+
+设置完毕后，您可以用下面的命令来修正本次提交所使用的用户身份：
+
+    git commit --amend --reset-author
+
+ 2 files changed, 2 deletions(-)
+ delete mode 100644 "MINA\347\254\254\344\270\200\346\255\245.txt"
+ delete mode 100644 hello.txt
+root@kali-vivian:~/learngit# 
+											     *
+***************************************** #2016#08#07#  MINA第一步 ***************************
+
+
+
+
+
+
+***************************************** #2016#08#09#  第二步_CodePractice0809 **************
+											     *
+root@kali-vivian:~# ls
+air.txt       cap-01.kismet.csv     HelloWorld.class  learngit   视频  音乐
+autosave.xmi  cap-01.kismet.netxml  HelloWorld.java   workspace  图片  桌面
+cap-01.cap    doc                   leapyear.class    公共       文档
+cap-01.csv    hello.class           leapyear.java     模板       下载
+root@kali-vivian:~# cd learngit
+root@kali-vivian:~/learngit# ls
+MINA第一步  第二步_CodePractice0809
+root@kali-vivian:~/learngit# touch 第二步_CodePractice0809 
+root@kali-vivian:~/learngit# git commit -m "#2016#08#09#,by Morpheus"
+位于分支 master
+您的分支领先 'test/master' 共 2 个提交。
+  （使用 "git push" 来发布您的本地提交）
+未跟踪的文件:
+	"\347\254\254\344\272\214\346\255\245_CodePractice0809"
+
+提交为空，但是存在尚未跟踪的文件
+root@kali-vivian:~/learngit# touch 第二步_CodePractice0809 
+root@kali-vivian:~/learngit# git add .
+root@kali-vivian:~/learngit# git commit -m "#2016#08#09#,by Morpheus"
+[master 6417b99] #2016#08#09#,by Morpheus
+ Committer: root <root@localhost.localdomain>
+您的姓名和邮件地址基于登录名和主机名进行了自动设置。请检查它们正确
+与否。您可以对其进行设置以免再出现本提示信息。运行如下命令在编辑器
+中编辑您的配置文件：
+
+    git config --global --edit
+
+设置完毕后，您可以用下面的命令来修正本次提交所使用的用户身份：
+
+    git commit --amend --reset-author
+
+ 1 file changed, 144 insertions(+)
+ create mode 100644 "\347\254\254\344\272\214\346\255\245_CodePractice0809"
+root@kali-vivian:~/learngit# 
+
+
+											     *
+***************************************** #2016#08#09#  第二步_CodePractice0809 **************
+
+
+
+
+
+
+
+
+***************************************** #2016#08#10#  第二步_CodePractice0810_serverDone **************
+													*
+
+root@kali-vivian:~# ls
+air.txt       cap-01.kismet.csv     HelloWorld.class  learngit   视频  音乐
+autosave.xmi  cap-01.kismet.netxml  HelloWorld.java   workspace  图片  桌面
+cap-01.cap    doc                   leapyear.class    公共       文档
+cap-01.csv    hello.class           leapyear.java     模板       下载
+root@kali-vivian:~# cd learngit/
+root@kali-vivian:~/learngit# ls
+MINA第一步  第二步_CodePractice0809  第二步_CodePractice0810_serverDone
+root@kali-vivian:~/learngit# git touch 第二步_CodePractice0810_serverDone
+git：'touch' 不是一个 git 命令。参见 'git --help'。
+root@kali-vivian:~/learngit# touch 第二步_CodePractice0810_serverDone
+root@kali-vivian:~/learngit# git add .
+root@kali-vivian:~/learngit# git commit -m "#2016#08#10#,by Morpheus"
+[master c96e60a] #2016#08#10#,by Morpheus
+ Committer: root <root@localhost.localdomain>
+您的姓名和邮件地址基于登录名和主机名进行了自动设置。请检查它们正确
+与否。您可以对其进行设置以免再出现本提示信息。运行如下命令在编辑器
+中编辑您的配置文件：
+
+    git config --global --edit
+
+设置完毕后，您可以用下面的命令来修正本次提交所使用的用户身份：
+
+    git commit --amend --reset-author
+
+ 1 file changed, 320 insertions(+)
+ create mode 100644 "\347\254\254\344\272\214\346\255\245_CodePractice0810_serverDone"
+root@kali-vivian:~/learngit# 
+													*
+***************************************** #2016#08#10#  第二步_CodePractice0810_serverDone **************
+
+
+
+
+***************************************** #2016#08#10#  第三步_ClientTest_0810 **************************
+													*
+root@kali-vivian:~# ls
+air.txt       cap-01.kismet.csv     HelloWorld.class  learngit   视频  桌面
+autosave.xmi  cap-01.kismet.netxml  HelloWorld.java   workspace  图片
+cap-01.cap    doc                   leapyear.class    公共       下载
+cap-01.csv    hello.class           leapyear.java     模板       音乐
+root@kali-vivian:~# cd le
+bash: cd: le: 没有那个文件或目录
+root@kali-vivian:~# cd learngit/
+root@kali-vivian:~/learngit# ls
+MINA第一步  第二步_CodePractice0809  第二步_CodePractice0810_serverDone
+root@kali-vivian:~/learngit# ls
+MINA第一步               第二步_CodePractice0810_serverDone
+第二步_CodePractice0809  第三步_ClientTest_0810
+root@kali-vivian:~/learngit# touch 第三步_ClientTest_0810 
+root@kali-vivian:~/learngit# git add .
+root@kali-vivian:~/learngit# git commit -m "#2016#08#11#,by Morpheus"
+[master 06aeefb] #2016#08#11#,by Morpheus
+ Committer: root <root@localhost.localdomain>
+您的姓名和邮件地址基于登录名和主机名进行了自动设置。请检查它们正确
+与否。您可以对其进行设置以免再出现本提示信息。运行如下命令在编辑器
+中编辑您的配置文件：
+
+    git config --global --edit
+
+设置完毕后，您可以用下面的命令来修正本次提交所使用的用户身份：
+
+    git commit --amend --reset-author
+
+ 1 file changed, 202 insertions(+)
+ create mode 100644 "\347\254\254\344\270\211\346\255\245_ClientTest_0810"
+													*
+***************************************** #2016#08#10#  第三步_ClientTest_0810 **************************
+
+
+**************************************** #2016#08#12#  第五步_IoService_Introduction_0812 ***************
+													*
+root@kali-vivian:~# ls
+air.txt       cap-01.kismet.csv     HelloWorld.class  learngit   视频  桌面
+autosave.xmi  cap-01.kismet.netxml  HelloWorld.java   workspace  图片
+cap-01.cap    doc                   leapyear.class    公共       下载
+cap-01.csv    hello.class           leapyear.java     模板       音乐
+root@kali-vivian:~# cd learngit/
+root@kali-vivian:~/learngit# ls
+MINA第一步                          第三步_ClientTest_0810
+第二步_CodePractice0809             第五步_IoService_Introduction_0812
+第二步_CodePractice0810_serverDone
+root@kali-vivian:~/learngit# touch 第五步_IoService_Introduction_0812 
+root@kali-vivian:~/learngit# git add .
+root@kali-vivian:~/learngit# git commit -m "#2016#08#12#,by Morpheus"
+[master 04532f1] #2016#08#12#,by Morpheus
+ Committer: root <root@localhost.localdomain>
+您的姓名和邮件地址基于登录名和主机名进行了自动设置。请检查它们正确
+与否。您可以对其进行设置以免再出现本提示信息。运行如下命令在编辑器
+中编辑您的配置文件：
+
+    git config --global --edit
+
+设置完毕后，您可以用下面的命令来修正本次提交所使用的用户身份：
+
+    git commit --amend --reset-author
+
+ 1 file changed, 342 insertions(+)
+ create mode 100644 "\347\254\254\344\272\224\346\255\245_IoService_Introduction_0812"
+root@kali-vivian:~/learngit#
+
+													*
+**************************************** #2016#08#12#  第五步_IoService_Introduction_0812 ***************
+
+
+**************************************** #2016#08#13#  第六步_MINA_Session_\&官方Chat_0813    ***********
+													*
+root@kali-vivian:~# ls
+air.txt       cap-01.kismet.csv     HelloWorld.class  learngit   视频  桌面
+autosave.xmi  cap-01.kismet.netxml  HelloWorld.java   workspace  图片
+cap-01.cap    doc                   leapyear.class    公共       下载
+cap-01.csv    hello.class           leapyear.java     模板       音乐
+root@kali-vivian:~# cd learngit/
+root@kali-vivian:~/learngit# ls
+MINA第一步                          第六步_MINA_Session_&官方Chat_0813
+第二步_CodePractice0809             第三步_ClientTest_0810
+第二步_CodePractice0810_serverDone  第五步_IoService_Introduction_0812
+root@kali-vivian:~/learngit# touch 第六步_MINA_Session_\&官方Chat_0813 
+root@kali-vivian:~/learngit# git add .
+root@kali-vivian:~/learngit# git commit -m "#2016#08#13#,by Morpheus"
+[master 85d7682] #2016#08#13#,by Morpheus
+ Committer: root <root@localhost.localdomain>
+您的姓名和邮件地址基于登录名和主机名进行了自动设置。请检查它们正确
+与否。您可以对其进行设置以免再出现本提示信息：
+
+    git config --global user.name "Your Name"
+    git config --global user.email you@example.com
+
+设置完毕后，您可以用下面的命令来修正本次提交所使用的用户身份：
+
+    git commit --amend --reset-author
+
+ 1 file changed, 157 insertions(+)
+ create mode 100644 "\347\254\254\345\205\255\346\255\245_MINA_Session_&\345\256\230\346\226\271Chat_0813"
+root@kali-vivian:~/learngit# 
+													*
+**************************************** #2016#08#13#  第六步_MINA_Session_\&官方Chat_0813    ***********
+
+
+
+**************************************** #2016#08#15#  第七步_MINA_Filter_0814    ***********************
+													*
+root@kali-vivian:~# cd learngit/
+root@kali-vivian:~/learngit# ls
+MINA第一步                          第七步_MINA_Filter_0814
+第二步_CodePractice0809             第三步_ClientTest_0810
+第二步_CodePractice0810_serverDone  第五步_IoService_Introduction_0812
+第六步_MINA_Session_&官方Chat_0813
+root@kali-vivian:~/learngit# touch 第七步_MINA_Filter_0814 
+root@kali-vivian:~/learngit# git add .
+root@kali-vivian:~/learngit# git commit -m "#2016#08#15#,by Morphues"
+[master 1d15cad] #2016#08#15#,by Morphues
+ Committer: root <root@localhost.localdomain>
+您的姓名和邮件地址基于登录名和主机名进行了自动设置。请检查它们正确
+与否。您可以对其进行设置以免再出现本提示信息：
+
+    git config --global user.name "Your Name"
+    git config --global user.email you@example.com
+
+设置完毕后，您可以用下面的命令来修正本次提交所使用的用户身份：
+
+    git commit --amend --reset-author
+
+ 1 file changed, 207 insertions(+)
+ create mode 100644 "\347\254\254\344\270\203\346\255\245_MINA_Filter_0814"
+root@kali-vivian:~/learngit#
+													*
+**************************************** #2016#08#15#  第七步_MINA_Filter_0814    ***********************
+
+(************************************************  第八步忘了发 = =  ************************************
+
+**************************************** #2016#08#16#  第九步_MINA_Handler_0815_16    *******************
+													*
+root@kali-vivian:~# ls
+air.txt       cap-01.kismet.csv     HelloWorld.class  learngit   视频  桌面
+autosave.xmi  cap-01.kismet.netxml  HelloWorld.java   workspace  图片
+cap-01.cap    doc                   leapyear.class    公共       下载
+cap-01.csv    hello.class           leapyear.java     模板       音乐
+root@kali-vivian:~# cd learngit/
+root@kali-vivian:~/learngit# ls
+MINA第一步                          第六步_MINA_Session_&官方Chat_0813
+第八步_Transports_0815              第七步_MINA_Filter_0814
+第二步_CodePractice0809             第三步_ClientTest_0810
+第二步_CodePractice0810_serverDone  第五步_IoService_Introduction_0812
+第九步_MINA_Handler_0815_16
+root@kali-vivian:~/learngit# touch 第九步_MINA_Handler_0815_16 
+root@kali-vivian:~/learngit# git add .
+root@kali-vivian:~/learngit# git commit -m "#2016#08#16#,by Morpheus"
+[master 7a871fd] #2016#08#16#,by Morpheus
+ Committer: root <root@localhost.localdomain>
+您的姓名和邮件地址基于登录名和主机名进行了自动设置。请检查它们正确
+与否。您可以对其进行设置以免再出现本提示信息：
+
+    git config --global user.name "Your Name"
+    git config --global user.email you@example.com
+
+设置完毕后，您可以用下面的命令来修正本次提交所使用的用户身份：
+
+    git commit --amend --reset-author
+
+ 2 files changed, 235 insertions(+)
+ create mode 100644 "\347\254\254\344\271\235\346\255\245_MINA_Handler_0815_16"
+ create mode 100644 "\347\254\254\345\205\253\346\255\245_Transports_0815"
+root@kali-vivian:~/learngit# 
+													*
+**************************************** #2016#08#16#  第九步_MINA_Handler_0815_16    *******************
+
+************  第八步忘了发 = =  补上     第八步_Transports_0815   ****************************************
+													*
+root@kali-vivian:~# ls
+air.txt       cap-01.kismet.csv     HelloWorld.class  learngit   视频  桌面
+autosave.xmi  cap-01.kismet.netxml  HelloWorld.java   workspace  图片
+cap-01.cap    doc                   leapyear.class    公共       下载
+cap-01.csv    hello.class           leapyear.java     模板       音乐
+root@kali-vivian:~# cd learngit/
+root@kali-vivian:~/learngit# ls
+MINA第一步                          第六步_MINA_Session_&官方Chat_0813
+第八步_Transports_0815              第七步_MINA_Filter_0814
+第二步_CodePractice0809             第三步_ClientTest_0810
+第二步_CodePractice0810_serverDone  第五步_IoService_Introduction_0812
+第九步_MINA_Handler_0815_16
+root@kali-vivian:~/learngit# touch 第八步_Transports_0815 
+root@kali-vivian:~/learngit# git add .
+root@kali-vivian:~/learngit# git commit -m "#2016#08#16#补发，by Morpheus"
+位于分支 master
+您的分支领先 'test/master' 共 9 个提交。
+  （使用 "git push" 来发布您的本地提交）
+无文件要提交，干净的工作区
+root@kali-vivian:~/learngit# git commit -m "#2016#08#16#补发，by Morpheus"
+位于分支 master
+您的分支领先 'test/master' 共 9 个提交。
+  （使用 "git push" 来发布您的本地提交）
+无文件要提交，干净的工作区
+root@kali-vivian:~/learngit# touch 第八步_Transports_0815 
+root@kali-vivian:~/learngit# git add .
+root@kali-vivian:~/learngit# git commit -m "#2016#08#16#补发，by Morpheus"
+位于分支 master
+您的分支领先 'test/master' 共 9 个提交。
+  （使用 "git push" 来发布您的本地提交）
+无文件要提交，干净的工作区
+root@kali-vivian:~/learngit# 
+
+
+××××××××××确实是9个正好。。啊哈？忘了记下 还查不到过去的命令 0.0   奇怪
+
+													*
+**********  确实是9个正好。。啊哈？忘了记下 还查不到过去的命令 0.0   奇怪 **********************************
+
+
+
+************************* #2016#08#17#  第十一步_MINAcore_CodecFilters_0816_17    ***********************
+													*
+root@kali-vivian:~# ls
+air.txt       cap-01.kismet.csv     HelloWorld.class  learngit   视频  桌面
+autosave.xmi  cap-01.kismet.netxml  HelloWorld.java   workspace  图片
+cap-01.cap    doc                   leapyear.class    公共       下载
+cap-01.csv    hello.class           leapyear.java     模板       音乐
+root@kali-vivian:~# cd learngit/
+root@kali-vivian:~/learngit# ls
+MINA第一步                          第七步_MINA_Filter_0814
+第八步_Transports_0815              第三步_ClientTest_0810
+第二步_CodePractice0809             第十步_MINAcore_IoBuffer_0816
+第二步_CodePractice0810_serverDone  第十一步_MINAcore_CodecFilters_0816_17
+第九步_MINA_Handler_0815_16         第五步_IoService_Introduction_0812
+第六步_MINA_Session_&官方Chat_0813
+root@kali-vivian:~/learngit# touch 第十一步_MINAcore_CodecFilters_0816_17 
+root@kali-vivian:~/learngit# git add .
+root@kali-vivian:~/learngit# git commit -m "#2016#08#17#,by Morpheus"
+[master 403c348] #2016#08#17#,by Morpheus
+ Committer: root <root@localhost.localdomain>
+您的姓名和邮件地址基于登录名和主机名进行了自动设置。请检查它们正确
+与否。您可以对其进行设置以免再出现本提示信息：
+
+    git config --global user.name "Your Name"
+    git config --global user.email you@example.com
+
+设置完毕后，您可以用下面的命令来修正本次提交所使用的用户身份：
+
+    git commit --amend --reset-author
+
+ 1 file changed, 514 insertions(+)
+ create mode 100644 "\347\254\254\345\215\201\344\270\200\346\255\245_MINAcore_CodecFilters_0816_17"
+root@kali-vivian:~/learngit# 
+													*
+************************* #2016#08#17#  第十一步_MINAcore_CodecFilters_0816_17    ***********************
+
+
+************************* #2016#08#19#  第十二步_MINAExeutorFilter_0819           ***********************
+													*
+root@kali-vivian:~# ls
+air.txt       cap-01.kismet.csv     HelloWorld.class  learngit   视频  桌面
+autosave.xmi  cap-01.kismet.netxml  HelloWorld.java   workspace  图片
+cap-01.cap    doc                   leapyear.class    公共       下载
+cap-01.csv    hello.class           leapyear.java     模板       音乐
+root@kali-vivian:~# cd learngit/
+root@kali-vivian:~/learngit# ls
+MINA第一步                          第七步_MINA_Filter_0814
+第八步_Transports_0815              第三步_ClientTest_0810
+第二步_CodePractice0809             第十步_MINAcore_IoBuffer_0816
+第二步_CodePractice0810_serverDone  第十二步_MINAExeutorFilter_0819
+第九步_MINA_Handler_0815_16         第十一步_MINAcore_CodecFilters_0816_17
+第六步_MINA_Session_&官方Chat_0813  第五步_IoService_Introduction_0812
+root@kali-vivian:~/learngit# touch 第十二步_MINAExeutorFilter_0819 
+root@kali-vivian:~/learngit# git add .
+root@kali-vivian:~/learngit# git commit -m "#2016#08#19#,by Morpheus"
+[master f5ffff2] #2016#08#19#,by Morpheus
+ Committer: root <root@localhost.localdomain>
+您的姓名和邮件地址基于登录名和主机名进行了自动设置。请检查它们正确
+与否。您可以对其进行设置以免再出现本提示信息：
+
+    git config --global user.name "Your Name"
+    git config --global user.email you@example.com
+
+设置完毕后，您可以用下面的命令来修正本次提交所使用的用户身份：
+
+    git commit --amend --reset-author
+
+ 1 file changed, 23 insertions(+)
+ create mode 100644 "\347\254\254\345\215\201\344\272\214\346\255\245_MINAExeutorFilter_0819"
+root@kali-vivian:~/learngit#
+													*
+************************* #2016#08#19#  第十二步_MINAExeutorFilter_0819           ***********************
+
+************************* #2016#08#21#  邑哥指导下 修改 用户名&密码    ***********************************
+root@kali-vivian:~/learngit# git config --global user.name "GaoYisheng"
+root@kali-vivian:~/learngit# git config --global user.email 1160139211@qq.com
+************************* #2016#08#21#  邑哥指导下 修改 用户名&密码    ***********************************
+
+************************* #2016#08#23#  第十三步_MINA_SSLFilter_0822_23           ***********************
+													*
+root@kali-vivian:~# ls
+air.txt       cap-01.kismet.csv     HelloWorld.class  learngit   视频  桌面
+autosave.xmi  cap-01.kismet.netxml  HelloWorld.java   workspace  图片
+cap-01.cap    doc                   leapyear.class    公共       下载
+cap-01.csv    hello.class           leapyear.java     模板       音乐
+root@kali-vivian:~# cd learngit/
+root@kali-vivian:~/learngit# ls
+MINA第一步                          第三步_ClientTest_0810
+第八步_Transports_0815              第十步_MINAcore_IoBuffer_0816
+第二步_CodePractice0809             第十二步_MINAExeutorFilter_0819
+第二步_CodePractice0810_serverDone  第十三步_MINA_SSLFilter_0822_23
+第九步_MINA_Handler_0815_16         第十一步_MINAcore_CodecFilters_0816_17
+第六步_MINA_Session_&官方Chat_0813  第五步_IoService_Introduction_0812
+第七步_MINA_Filter_0814
+root@kali-vivian:~/learngit# touch 第十三步_MINA_SSLFilter_0822_23 
+root@kali-vivian:~/learngit# git add .
+root@kali-vivian:~/learngit# git commit -m "#2016#08#23#,by Morpheus"
+[master de5a544] #2016#08#23#,by Morpheus
+ 1 file changed, 448 insertions(+)
+ create mode 100644 "\347\254\254\345\215\201\344\270\211\346\255\245_MINA_SSLFilter_0822_23"
+root@kali-vivian:~/learngit# 
+													*
+************************* #2016#08#23#  第十三步_MINA_SSLFilter_0822_23           ***********************
+
+
+************************* #2016#08#23#  第十四步_MINA_LoggingFilter_0823           **********************
+													*
+root@kali-vivian:~# ls
+air.txt       cap-01.kismet.csv     HelloWorld.class  learngit   视频  桌面
+autosave.xmi  cap-01.kismet.netxml  HelloWorld.java   workspace  图片
+cap-01.cap    doc                   leapyear.class    公共       下载
+cap-01.csv    hello.class           leapyear.java     模板       音乐
+root@kali-vivian:~# cd learngit/
+root@kali-vivian:~/learngit# ls
+MINA第一步                          第三步_ClientTest_0810
+第八步_Transports_0815              第十步_MINAcore_IoBuffer_0816
+第二步_CodePractice0809             第十二步_MINAExeutorFilter_0819
+第二步_CodePractice0810_serverDone  第十三步_MINA_SSLFilter_0822_23
+第九步_MINA_Handler_0815_16         第十四步_MINA_LoggingFilter_0823
+第六步_MINA_Session_&官方Chat_0813  第十一步_MINAcore_CodecFilters_0816_17
+第七步_MINA_Filter_0814             第五步_IoService_Introduction_0812
+root@kali-vivian:~/learngit# touch 第十四步_MINA_LoggingFilter_0823 
+root@kali-vivian:~/learngit# git add .
+root@kali-vivian:~/learngit# git commit -m "#2016#08#23#,by Morpheus"
+[master e24300b] #2016#08#23#,by Morpheus
+ 1 file changed, 150 insertions(+)
+ create mode 100644 "\347\254\254\345\215\201\345\233\233\346\255\245_MINA_LoggingFilter_0823"
+root@kali-vivian:~/learngit# 
+													*
+************************* #2016#08#23#  第十四步_MINA_LoggingFilter_0823           **********************
+
+
+
+
+													*
+													*
+													*
+													*
+													*
+													*
+													*
+													*
+													*
+													*
+													*
+
+

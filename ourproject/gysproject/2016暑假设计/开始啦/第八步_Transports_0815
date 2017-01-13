@@ -1,0 +1,165 @@
+
+						Chapter 6 - Transports
+#08#15#
+
+*******************************
+Chapter 6 - Transports        *
+			      *
+    +APR Transport	      *
+    +Serial Transport  	      *
+*******************************
+
+
+****************************************  APR Transport  **************************************************
+													  *
+APR Transport			//ARP传输
+
+
+Introduction
+
+APR (Apache Portable Runtime) provide superior scalability, performance, and better integration with native server technologies. APR transport is supported by MINA. In this section, we shall touch base upon how to use APR transport with MINA. We shall the Time Server example for this.
+//4月(Apache Portable Runtime)提供优越的可伸缩性、性能和更好的整合与本地服务器技术。4月运输支持米娜。在本节中,我们将联系基础如何使用4月运输与米娜。
+//我们将用time server的例子。
+
+Pre-requisite
+	APR transport depends following components   //恩要有以下组件支持
+	APR library - Download/install appropriate library for the platform from http://www.apache.org/dist/tomcat/tomcat-connectors/native/
+	JNI wrapper (tomcat-apr-5.5.23.jar) The jar is shipped with release
+		//要tomcat的环境。。还好早就配好了。。
+
+	Put the native library in PATH 			
+
+
+Using APR Transport
+
+Refer Time Server example for complete source	//参考 TimeServer （就是最早发的那个  TimeServer）
+
+Lets see how NIO based Time server implementation looks like：
+//阻塞式     （Time server ）
+***********************
+IoAcceptor acceptor = new NioSocketAcceptor();
+
+acceptor.getFilterChain().addLast( "logger", new LoggingFilter() );
+acceptor.getFilterChain().addLast( "codec", new ProtocolCodecFilter( new TextLineCodecFactory( Charset.forName( "UTF-8" ))));
+
+acceptor.setHandler(  new TimeServerHandler() );
+
+acceptor.getSessionConfig().setReadBufferSize( 2048 );
+acceptor.getSessionConfig().setIdleTime( IdleStatus.BOTH_IDLE, 10 );
+
+acceptor.bind( new InetSocketAddress(PORT) );
+***********************
+
+
+Lets see how to use APR Transport
+//ARP 式
+
+
+************************
+IoAcceptor acceptor = new AprSocketAcceptor();		//就这一点区别！！！  构造的是 NIO / ARP 
+
+acceptor.getFilterChain().addLast( "logger", new LoggingFilter() );
+acceptor.getFilterChain().addLast( "codec", new ProtocolCodecFilter( new TextLineCodecFactory( Charset.forName( "UTF-8" ))));
+
+acceptor.setHandler(  new TimeServerHandler() );
+
+acceptor.getSessionConfig().setReadBufferSize( 2048 );
+acceptor.getSessionConfig().setIdleTime( IdleStatus.BOTH_IDLE, 10 );
+
+acceptor.bind( new InetSocketAddress(PORT) );
+************************
+
+
+
+We just change the NioSocketAcceptor to AprSocketAcceptor. That's it, now our Time Server shall use APR transport.
+//只是改变NioSocketAcceptor 到 AprSocketAcceptor。对了,  现在我们的时间服务器应当使用4月运输。
+
+Rest complete process remains same.
+//其他完整的流程仍然是相同的。 是的。 ლ(╹◡╹ლ)
+													  *
+****************************************  APR Transport  **************************************************
+
+
+
+***************************************  Serial  Transport  ***********************************************
+													  *
+Serial Transport
+//串行传输 
+
+
+
+With the MINA 2.0 you are able to connect to serial port like you use to connect to a TCP/IP port with MINA.
+//米娜2.0 可以连接到 串行端口  就像 使用米娜连接到TCP / IP端口。
+
+
+Getting MINA 2.0
+
+You you can download the latest built version (2.0.2).
+
+*使用环境*
+If you prefer to build the code from the trunk, and need assistance to do so, please consult the Developer Guide.
+Prerequisite
+Useful Information
+Before accessing serial port from a Java program you need a native library (.DLL or .so depending of your OS). MINA use the one from RXTX.org : ftp://ftp.qbang.org/pub/rxtx/rxtx-2.1-7-bins-r2.zip.
+Just put the good .dll or .so in the jre/lib/i386/ path of your JDK/JRE or use the -Djava.library.path= argument for specify where you placed the native libraries
+Useful Information
+The mina-transport-serial jar is not included in the full distribution. You can download it from here
+*使用环境*
+
+
+Connecting to a serial port
+
+Serial communication for MINA provide only an IoConnector, due to the point-to-point nature of the communication media.
+//对于串行通信，MINA提供的只有一个  IoConnector，，这是由于 点对点 通信的性质。
+
+At this point you are supposed to have already read the MINA tutorial.  //of crouse.
+
+Now for connecting to a serial port you need a SerialConnector :
+//现在链接到 serial port  需要一个   SerialConnector 
+
+// create your connector      
+IoConnector connector = new SerialConnector();
+connector.setHandler( ... here your buisness logic IoHandler ... );
+
+Nothing very different of a SocketConnector.
+//跟SocketConnector没啥不同。   。。显然 = =
+
+Let's create an address for connecting to our serial port.
+//创建一个地址  连接到串行端口上。
+
+SerialAddress portAddress=new SerialAddress( "/dev/ttyS0", 38400, 8, StopBits.BITS_1, Parity.NONE, FlowControl.NONE );
+
+
+
+The first parameter is your port identifier. For Windows computer, the serial ports are called "COM1", "COM2", etc... For Linux and some other Unix : "/dev/ttyS0", "/dev/ttyS1", "/dev/ttyUSB0".
+//第一个参数是你的端口标识符。   Windows电脑的串口被称为“COM1”、“COM2”等……Linux和其他一些Unix来说是:“/ dev / ttyS0”、“/ dev / ttyS1”、“/ dev / ttyUSB0”。
+
+The remaining parameters are depending of the device you are driving and the supposed communications characteristics.
+//其余的参数是根据 设备的运行和所谓的通信特点  （来设定的）。
+
+
+    the baud rate		//波特率	：模拟线路信号的速率,也称调制速率,以波形每秒的振荡数来衡量
+    the data bits		//数据位
+    the parity			//奇偶校验	：(Parity Check)是一种校验代码传输正确性的方法。根据被传输的一组二进制代码的数位中“1”的个数是奇数或偶数来进行校验。
+    the flow control mecanism	//流控制机制	：
+	/*流量控制 用于防止在端口阻塞的情况下丢帧，这种方法是当发送或接收缓冲区开始溢出时通过将阻塞信号发送回源地址实现的。流量控制可以有效的防止由于网络中瞬间的大量数据对网络带来的冲击，保证用户网络高效而稳定的运行	*/
+	
+
+Once it's done, connect the connector to the address :
+//一旦完成,将 连接器 连接到地址:
+
+ConnectFuture future = connector.connect( portAddress );
+future.await();
+IoSession sessin = future.getSession();
+
+And voila ! Everything else is as usual, you can plug your filters and codecs. for learn more about RS232 : http://en.wikipedia.org/wiki/RS232
+//瞧!其他的都是像往常一样,你可以插入你的 过滤器和编解码器。了解更多关于RS232:http://en.wikipedia.org/wiki/RS232    ლ(╹◡╹ლ) 
+													  *
+***************************************  Serial  Transport  ***********************************************
+
+/*
+恩，再这样继续下去，差不多可以“目无全牛”了  2333333
+
+*/
+
+

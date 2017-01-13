@@ -1,0 +1,37 @@
+ 
+
+ 0 mina 了解
+
+ 1 UML(umbrello) 写一个框架 .en 还是先往后放放吧，毕竟太不了解MINA
+
+ 2 git存到本地
+
+ 3 一点点实现 代码
+
+
+#08#04# 
+	1。搜集资料。  已存大部分。（PDF,源码）。
+
+
+#08#06#
+	1。配置UML（Umbrello） 学习并尝试 画出总体框架（失败）。（先了解MINA把）。
+
+#08#07#
+	1。配置MINA   git commit 到本地			Step 1. ( @MINA第一步 ）  %%%%%%%%%%%%
+
+	2。跟着apache Handbook一步一步来。
+	       http://mina.apache.org/mina-project/userguide/ch2-basics/sample-tcp-server.html
+
+
+
+
+
+
+
+
+
+
+
+
+
+	

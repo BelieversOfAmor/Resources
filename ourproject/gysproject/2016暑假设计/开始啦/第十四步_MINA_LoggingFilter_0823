@@ -1,0 +1,150 @@
+						Chapter 12 - Logging Filter
+						             
+
+/*
+ *#08#23# ,日志过滤器.
+ *@translator:Morpheus.
+ */
+
+*********************************************************************************************************************************
+ 目录
+    Chapter 12 - Logging Filter
+      Background
+        SLF4J
+            Choosing the Right JARs
+            Overriding Jakarta Commons Logging
+        log4j example
+
+
+
+Background 
+	//环境
+
+The Apache MINA uses a system that allows for the developer of the MINA-base application to use their own logging system.
+	//Apache MINA 使用一个(允许MINA-base应用程序的开发人员使用他们自己的日志)系统,。
+
+
+SLF4J
+
+MINA employs the Simple Logging Facade for Java (SLF4J). You can find information on SLF4J here. This logging utility allows for the implementation of any number of logging systems. You may use log4j, java.util.logging or other logging systems. The nice part about this is that if you want to change from java.util.logging to log4j later on in the development process, you do not need to change your source code at all.
+/*
+米娜使用简单的Java日志Facade(SLF4J)。
+你可以在这里找到SLF4J信息。这个日志记录工具允许任意数量的 日志系统 的实例。
+你可以使用log4j  , java.util.logging   或其他日志系统。很棒的是： 如果你想在后面的开发过程中 把 java.util.logging 改为 log4j  ,你不需要改变你的源代码。
+*/
+
+Choosing the Right JARs
+	//选择合适JARs
+
+SLF4J uses a static binding. This means there is one JAR file for each supported logging framework. You can use your favorite logging framework by choosing the JAR file that calls the logging framework you chose statically. The following is the table of required JAR files to use a certain logging framework.
+//SLF4J 使用静态绑定。这意味着 每个的日志框架都有一个 JAR文件 支持。你可以  通过选择JAR文件（调用静态日志框架）  选择你最喜欢的日志框架  。
+//下面是 使用一个特定的日志框架   所需的JAR文件的表。
+—————————————————————————————————————————————————————————————————
+Logging 			framework Required JARs
+
+Log4J 1.2.x 			slf4j-api.jar, slf4j-log4j12.jar**
+Log4J 1.3.x 			slf4j-api.jar, slf4j-log4j13.jar
+java.util.logging 		slf4j-api.jar, slf4j-jdk14.jar**
+Commons Logging 		slf4j-api.jar, slf4j-jcl.jar
+—————————————————————————————————————————————————————————————————
+
+There are a few things to keep in mind:
+	//有几件事要记住:
+
+    slf4j-api.jar is used commonly across any implementation JARs.
+	//slf4j-api.jar   通常 贯穿 所有的 JARs。
+    IMPORTANT You should not put more than one implementation JAR files in the class path (e.g. slf4j-log4j12.jar and slf4j-jdk14.jar); it might lead your application to a unexpected behavior.
+	/重要：不应该  在class path 中put多个implementation JAR文件 ，(例如slf4j-log4j12.jar和slf4j-jdk14.jar);它可能导致应用程序异常行为.  ... 实验过 会的  哈哈。
+    The version of slf4j-api.jar and slf4j-.jar should be identical.
+	//slf4j-api.jar和slf4j-.jar的版本  应该是相同的。	
+
+Once configured properly, you can continue to configure the actual logging framework you chose (e.g. modifying log4j.properties).
+	//正确配置后,         可以继续配置 实际的（你选择的）日志框架       (比如 修改log4j.properties)。      ლ(╹◡╹ლ)
+
+
+Overriding Jakarta Commons Logging
+	//重写 Jakarta Commons Logging
+
+SLF4J also provides a way to convert the existing applications that use Jakarta Commons Logging to use SLF4J without changing the application code. Just remove commons-loggong JAR file from the class path, and add jcl104-over-slf4j.jar to the class path.
+	//SLF4J还提供了一种方式 可以将 现有的 应用程序  使用 Jakarta Commons Logging SLF4J 而不必 不改变应用程序 代码。
+	//仅需要 删除 commons-loggong JAR文件  的类路径  ,  并添加jcl104-over-slf4j.jar的类路径。
+
+log4j example
+
+For this example we will use the log4j logging system. We set up a project and place the following snippet into a file called log4j.properties:
+	//对于这个示例,我们将使用  log4j日志记录系统  。我们建立了一个项目,并将 以下代码片段 移到 为一个名为log4j.properties的文件:
+
+
+
+# Set root logger level to DEBUG and its only appender to A1.
+log4j.rootLogger=DEBUG, A1
+
+# A1 is set to be a ConsoleAppender.
+log4j.appender.A1=org.apache.log4j.ConsoleAppender
+
+# A1 uses PatternLayout.
+log4j.appender.A1.layout=org.apache.log4j.PatternLayout
+log4j.appender.A1.layout.ConversionPattern=%-4r [%t] %-5p %c{1} %x - %m%n
+
+
+
+This file will be placed in the src directory of our project. If you are using an IDE, you essentially want the configuration file to be in the classpath for the JVM when you are testing your code.
+	//这个文件将被放置在  项目的 src目录中 。 如果您正在使用一个 IDE , 您基本上希望配置文件在 JVM的类路径中 当你测试你的代码。
+
+注意：
+Although this shows you how to set up an IoAcceptor to use logging, understand that the SLF4J API may be used anywhere in your program in order to generate proper logging information suitable to your needs.
+	//虽然展示了    如何建立一个IoAcceptor去 使用logging        ,  了解   SLF4J API  可以 在你的程序任何地方使用  来 生成适当的、适合您的需要的日志信息。
+
+Next we will set up a simple example server in order to generate some logs. Here we have taken the EchoServer example project and added logging to the class:
+	//接下来，为了生成一些日志，我们将设置一个简单的示例服务器。            这里我们有   EchoServer示例项目  和  添加 logging 到类:
+
+public static void main(String[] args) throws Exception {
+    IoAcceptor acceptor = new SocketAcceptor();
+    DefaultIoFilterChainBuilder chain = acceptor.getFilterChain();
+
+LoggingFilter loggingFilter = new LoggingFilter();
+    chain.addLast("logging", loggingFilter);
+
+    acceptor.setLocalAddress(new InetSocketAddress(PORT));
+    acceptor.setHandler(new EchoProtocolHandler());
+    acceptor.bind();
+
+    System.out.println("Listening on port " + PORT);
+}
+
+
+As you can see we removed the addLogger method and added in the 2 lines added to the example EchoServer. With a reference to the LoggingFilter, you can set the logging level per event type in your handler that is associated with the IoAcceptor here. In order to specify the IoHandler events that trigger logging and to what levels the logging is performed, there is a method in the LoggingFilter called setLogLevel(IoEventType, LogLevel). Below are the options for this method:
+	//正如你所看到的我们移除 addLogger 方法 然后 添加两行到EchoServer示例。用 LoggingFilter的引用,   您可以设置 日志级别/事件类型 在 IoAcceptor相关联的处理程序 中。
+	//为了指定 IoHandler 触发的事件日志 和 指定等级的logging执行 ,  （在LoggingFilter中)有一个方法叫setLogLevel(IoEventType LogLevel)。下面是这个方法的选择:
+————————————————————————————————————————————————————————————————————————————————
+IoEventType 		Description						//事件类型 和 描述
+
+SESSION_CREATED 	Called when a new session has been created		//当   一个session创建	   时  	调用
+SESSION_OPENED 		Called when a new session has been opened		//当   一个session打开	   时  	调用
+SESSION_CLOSED 		Called when a session has been closed			//当   一个session关闭	   时  	调用
+MESSAGE_RECEIVED 	Called when data has been received			//当   接收到 数据   	   时  	调用	
+MESSAGE_SENT 		Called when a message has been sent			//当   一个信息发出  	   时  	调用
+SESSION_IDLE 		Called when a session idle time has been reached	//当 一个session达到延迟时间时	调用
+EXCEPTION_CAUGHT 	Called when an exception has been thrown		//当 一个异常 被抛出  	   时	调用
+————————————————————————————————————————————————————————————————————————————————
+
+Here are the descriptions of the LogLevels:
+	//这里是Log等级      描述:
+————————————————————————————————————————————————————————————————————————————————————————————————————————————
+LogLevel 	Description
+
+NONE 		This will result in no log event being created regardless of the configuration  //这将导致  无论如何配置  都 没有日志事件创建。
+TRACE 		Creates a TRACE event in the logging system					//创建一个 （TRACE）跟踪 事件    到 logging system 中
+DEBUG 		Generates debug messages in the logging system					//生成 调试消息     		到 logging system 中
+INFO 		Generates informational messages in the logging system				//生成 信息消息 		到 logging system 中
+WARN 		Generates warning messages in the logging system				//生成 warning消息		到 logging system 中
+ERROR 		Generates error messages in the logging system					//生成 error消息		到 logging system 中
+————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+With this information, you should be able to get a basic system up and running and be able to expand upon this simple example in order to be generating log information for your system.
+	//根据这些信息,     您应该能够得到一个基本系统启动和运行      ,然后能够   扩展这个简单的例子   为自己的系统 产生日志信息   。
+
+*****************************************************************************************************************************
+
+至此，MINA 的handbook学习告一段落，（仅学习了MINA的 basic 和 core 部分，高级部分代理什么的以后在说）。
+

@@ -1,0 +1,70 @@
+					Chapter 7 - Handler
+#08#15#
+
+**********************************************************************************************************************
+Handles all I/O events fired by MINA. The interface is hub of all activities done at the end of the Filter Chain.
+//处理所有I / O事件都被米娜"解雇"了ლ(╹◡╹ლ)。  接口是所有(在过滤器链的最后完成的)活动的中心。
+
+IoHandler has following functions
+//IoHandler 具有以下功能：
+
+    sessionCreated	//创建
+    sessionOpened	//打开
+    sessionClosed	//关闭
+    sessionIdle		//闲置
+    exceptionCaught	//捕获异常
+    messageReceived	//接收消息
+    messageSent		//发送消息
+
+
+sessionCreated Event
+
+Session Created event is fired when a new connection is created. For TCP its the result of connection accept, and for UDP this is generated when a UDP packet is received. This function can be used to initialize session attributes, and perform one time activities for a particular connection.
+//当1个新连接创建时，Session Created时间就触发了。对于TCP型 是链接接受的结果,而UDP 这是收到数据包是生成的。
+//这个函数可以用来初始化Session属性, 并为特定的连接 执行一次 活动。
+
+This function is invoked from the I/O processor thread context, hence should be implemented in a way that it consumes minimal amount of time, as the same thread handles multiple sessions.
+//这个函数是从I / O处理器线程环境（？）调用来的,  因此应该（用最少的次数的方式）实现, 作为相同的线程处理多个会话。
+
+
+
+sessionOpened Event
+
+Session opened event is invoked when a connection is opened. Its is always called after sessionCreated event. If a thread model is configured, this function is called in a thread other than the I/O processor thread.
+//连接打开时 调用 Session opened事件。它总是在sessionCreated事件之后被调用。如果一个线程模型配置好了 ,这个函数 一个线程 被调用（除了I / O处理器线程）。
+
+
+
+sessionClosed Event
+
+Session Closed event is closed, when a session is closed. Session cleaning activities like cash cleanup can be performed here.
+//当一个Session关闭时，Session关闭事件触发（关闭？？）  。会话清理活动（比如缓冲区清理）执行。
+
+
+sessionIdle Event
+
+Session Idle event is fired when a session becomes idle. This function is not invoked for UDP transport.
+//当一个会话闲置时，sessionIdle Event触发。这个函数UDP传输不调用。
+
+
+exceptionCaught Event
+
+This functions is called, when an Exception is thrown by user code or by MINA. The connection is closed, if its an IOException.
+/由用户代码或MINA抛出异常时，这个函数被调用。如果一个IOException,连接关闭。
+
+
+messageReceived Event
+
+Message Received event is fired whenever a message is received. This is where the most of the processing of an application happens. You need to take care of all the message type you expect here.
+//消息收到的时候，消息接收事件触发。    这就是大多数应用程序的处理。你需要照顾 所有消息类型。
+
+
+messageSent Event
+
+Message Sent event is fired, whenever a message aka response has been sent(calling IoSession.write()).
+//当massage或者说response 发送(调用IoSession.write())  ,,   Message Sent事件触发,  。
+
+
+#08#15# && #08#16#
+**********************************************************************************************************************
+

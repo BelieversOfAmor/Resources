@@ -1,0 +1,448 @@
+
+  					Chapter 11 - SSL Filter
+	 					//第十章——执行人过滤器
+/*  
+ *#08#22# & #08#23#                  
+ *@translator:morpheus.         
+ */
+*******************************************************************************************************************
+
+*SSL(Secure Sockets Layer 安全套接层),及其继任者传输层安全（Transport Layer Security，TLS）是为网络通信提供安全及数据完整性的一种安全协议。
+ TLS与SSL在传输层对网络连接进行加密。
+
+* TLS：安全传输层协议 
+  （TLS：Transport Layer Security Protocol） 
+  安全传输层协议（TLS）用于在两个通信应用程序之间提供保密性和数据完整性。该协议由两层组成： TLS 记录协议（TLS Record）和 TLS 握手协议（TLS Handshake）。较低的层为 TLS 记录协议，位于某个可靠的传输协议（例如 TCP）上面。 
+
+
+
+
+The SslFilter is the filter in charge of managing the encryption and decryption of data sent through a secured connection. Whenever you need to establish a secured connection, or to transform an existing connection to make it secure, you have to add the SslFilter in your filter chain.
+	//这个Ssl过滤器 负责管理 在安全的连接中的 数据的加密和解密 。无论何时  需要建立一个安全连接 , 或将现有的连接 安全化 , 必须添加SslFilter到 过滤器链。
+
+SslFilter
+
+As any session can modify it's message filter chain at will, it allows for protocols like startTLS to be used on an opened connection.
+Please note that although the name include SSL, SslFilter supports TLS. Actually, TLS is supposed to have replaced SSL, but for historical reason, SSL remains widely used.
+	// 任何会话 都可以 修改 它的信息过滤器链 , 它允许使用协议 像 startTLS用到一个打开的连接上。
+	//注意！  虽然这个名字包括 SSL , SslFilter 支持TLS 。 实际上, TLS 应该已经取代了 SSL , 但是由于历史原因 , SSL仍然广泛使用。
+
+Basic usage
+	//基本用法¶
+
+If you want your application to support SSL/TLS, just add the SslFilter in your chain :
+	//如果 想让你的应用程序支持SSL / TLS , 只需添加SslFilter 到 过滤器链:
+
+...
+DefaultIoFilterChainBuilder chain = acceptor.getFilterChain();	
+SslFilter sslFilter = new SslFilter(sslContext);
+chain.addFirst("sslFilter", sslFilter);
+...
+
+
+You obviously need a SslContext instance too :
+	// 显然 也 需要一个 SslContext 实例:
+
+
+SSLContext sslContext;
+
+    try
+    {
+        // Initialize the SSLContext to work with our key managers.	初始化 SSLContext 为了 带着 关键管理员 工作  = = 
+        sslContext = SSLContext.getInstance( "TLS" );
+        sslContext.init( ... ); // Provide the needed KeyManager[], TrustManager[] and SecureRandom instances	提供所需的 。 。 和 。实例
+    }
+    catch ( Exception e )
+    {
+        // Handle your exception	
+    }
+
+
+
+This is up to you to provide the KeyManager, TrustManager and SecureRandom instances.
+	//这是由你来提供KeyManager,TrustManager和SecureRandom实例。
+
+
+be sure to inject the SslFilter on the first position in your chain !
+	//一定要 把SslFilter加到 过滤器链的 首位  ！！！！！！！！!			注意，必须放首位，。！
+
+We will see later a detailed exemple on how to create a SSLContext.
+	//。稍后 将详细介绍 如何创建一个SSLContext。
+
+
+A bit of theory
+	//一些理论¶
+
+
+If you want to get a deeper understanding on how it all works, please read the following paragraphs...
+	// 深入了解往下看
+
+
+SSL Basics
+	//SSL基础知识¶
+
+
+We are not going to explain how SSL works, there are very good books outhere. We will just give a quick introduction on how it works and how it is implemented in MINA.
+	//我们不打算解释 SSL 是如何工作的 , 在别处 有很多好书。我们将给一个快速介绍它是如何工作的 , 以及它是如何 在MINA 中实现。
+
+First of all, you have to understand that SSL/TLS is a protocol defined in RFCs : TLS 1.0, TLS 1.1 and TLS 1.2. There is a TLS 1.3 draft being worked on...
+	//首先,  必须明白SSL / TLS 是一个 定义 在 RFC 中协议    : TLS 1.0,TLS 1.1和TLS 1.2 。 还有 TLS 1.3 起草中…
+
+It was initially developed by Netscape, and named SSL (from 1.0 to 3.0), before becoming TLS. Nowadays, SSL 2.0* and SSL 3.0** have been deprecated and should not be used.
+	//它最初是由 Netscape 建立 , 命名为 SSL (从1.0到3.0) , 变为 TLS 之前 。 如今,SSL 2.0.x和SSL 3.0.x 已经弃用, 不要再用了。
+
+
+The SSL/TLS protocol
+	// SSL / TLS协议¶
+
+
+As it's a protocol, it requires some dialog between a client and a server. This is all what SSL/TLS is about : describing this dialog.
+	//因为它是一个协议 , 它 依赖 客户端和服务器之间的一些对话 。 这是所有的  SSL / TLS 关于  : 描述该对话。
+
+It's enough to know that any secured exchange is precluded by a negociation phase, called the Handshake, which role is to come to an agreement between the client and the server on what will be the encryption method to use. A basic SSL/TLS session will be something that looks like :
+	//足以知道任何担保交易是杜绝一个过程阶段,叫做握手,它的角色是客户端和服务器之间达成协议将加密方法来使用。
+	//一个基本的SSL / TLS会话将会看起来像:
+
+			
+TLS Protocol		// 假装 有图
+
+As you can see in this picture, it's a 2 phases protocol : first the handshake, then when completed the client and the server will be able to exchange data that will be encrypted.
+
+
+The Handshake
+	//握手¶
+
+Basically, it's all about negociating many elements that are to be used to encrypt the data. The details are not so interesting in the context of this document, enough said that many messages are going to be exchanged between the client and the server, and no data can be sent during this phase.
+	//基本上,它是为了 保险 许多元素用于数据加密。在本文的上下文中的细节不是很有趣,可以说 许多消息 是客户机和服务器之间交换,并且没有数据可以在这个阶段发送。
+
+
+Actually, there are two conditions for the handshake to start : The server must be waiting for some handshake message to arrive The client must send a ClientHello message
+	//实际上,握手开始有两个条件 : 服务器必须等待握手消息，客户端必须发送 ClientHello 消息。
+
+We do use the Java SSLEngine class to manage the whole SSL/TLS protocol. What MINA should take care of is the current status of the session is such that it will be able to get and deal with the client HelloClient message. 
+	//我们使用Java SSLEngine类来 管理整个SSL/TLS协议。MINA应该照顾会话的现状 是,这样 它将能够获取 和 处理 客户端 的 HelloClient 消息。
+
+When you inject the SslFilter in your filter chain, a few things happen :
+	//当你在过滤器链中加入SslFilter时 , 这些事情发生了:
+
+   1 A SslHandler instance is created (we create one instance per session). This SslHandler instance is in charge of the whole processing (handshake and encryption/decryption of forthcoming messages)
+   2 This SslHandler creates a SSLEngine using the SslContext instance that has been attached to the SslFilter
+   3 The SslEngine instance is configured and initialized
+   4 The SslHandler instance is stored into the session
+   5 Unless required specifically, we initiate the Handshake (which has different meanings on client side and on server side : the client will then send the ClientHello message, while the server switch to a mode where it waits for some data to be unwrapped). Note that the handshake initialization can be done later on, if needed
+   
+   1 一个 SslHandler 实例被创建(每个会话都创建一个实例)。这个 SslHandler 实例负责整个处理 (握手和即将到来的消息的加密/解密).
+   2 这个 SslHandler 使用 SslContext 创建一个 SSLEngine实例 附加到 SslFilter上.
+   3 SslEngine 实例 被配置 和 初始化.
+   4 SslHandler 实例 被存储到session中.
+   5 除非需要具体地说明 , 否则我们发起握手(在客户端和服务器端有不同的含义：客户端将发送ClientHello消息,而服务器切换到一个模式,它等待接收一些数据)。
+	注意 ：如果需要的话，初始化握手可以 以后做 . 
+
+
+
+We are all set. The next few steps are pure SSL/TLS protocol exchange. If the session.write() method is called, the message will be enqueued waiting for the handshake to be completed. Any pending message at the time the SslFilter is added into the chain will cause the SSL/TLS handshake to fail, so be sure that you have a clean place when you want to inject it. We also won't receive any message that is not a SSL/TLS protocol message.
+	//我们都 设置好了以后。接下来的几个步骤是纯粹的SSL / TLS协议交换。如果session.write()方法被调用时 , 该消息将 排队 等待握手完成。    ！！！！！！！
+	//任何等待消息当时SslFilter添加到链会导致SSL / TLS握手失败,所以确保你有一个干净的地方当你想注入。我们也不会收到任何消息,这并不是一个SSL / TLS协议消息。
+
+
+
+This last point is important if you are to implement StartTLS : as it allows your application to switch from a plain text exchange to an encrypted exchange at any time, you have to be sure that there are not pending messages on both side. Obviously, on the client side - the side that initiates StartTLS - every pending messages will have been sent before the StartTLS message can be sent, but it has to block any other message that are not part of the following handshake, until the handshake is completed. On the server side, once the StartTLS message has been received, no message should be written to the remote peer.
+	//最后一点很重要,如果你想实现StartTLS:因为它允许您的应用程序在任何时候 从一个纯文本交换 转换成 加密交换 , 要确保 两侧 没有等待消息。		好难懂。
+	//显然,在客户端——启动StartTLS——每个等待中的消息将在 StartTLS消息可以发送 之前发送 , 但它必须 阻塞 不属于接下来握手的 任何其他信息 ,直到完成握手。
+	//     在服务器端, 一旦 StartTLS 消息已经收到 , 同样 没有消息应该被写入到  远端对等实体。	？？？
+
+
+As a matter of fact, injecting the SslFilter in the chain should block any exchange that are not part of the handshake protocol until the handshake is completed. If you submit a message to be sent and encrypted before the handshake has been completed, the message will not be rejected but queued and will be processed when the handshake has been completed.
+	//事实上,把SslFilter加到过滤器链中应该阻止任何（不是握手协议中的一部分的）交换 , 直到握手完成。
+	//如果你（ 在 握手完成之前 ）提交一个消息去 发送和加密 , 消息不会被 拒绝接收 但会 排队和 等待握手完成时 处理 。   /候着等握手完成在处理/
+
+Afterward, every message sent will go through the SslHandler instance to be encrypted, and every message received will have to be fully decrypted by the SslHandler before being available to the next filters.
+	//握手之后 , 每个发送的消息 将会 通过SslHandler 实例 被加密  ,然后    每条消息收到之后（在提供给下一个过滤器之前）必须完全被 SslHandler 解密 。
+
+
+Sending data
+	//发送数据
+
+
+Ok, the Handshaked has been completed. Your SslFilter is ready to process incoming and outgoing messages. Let's focus on those your session are going to write.
+	//握手完成后。。SslFilter准备好处理 传入和传出 的消息。然后来   关注 哪些 session 要写。
+
+One important thing is that you may write more than one message on the same session (if you have an Executor in your chain). The problem is that the SSLEngine is not capable of dealing with more than one message at a time. We need to serialize the messages being written out. It's even worse : you can't process an incoming message and and outgoing message at the same time.
+	//重要的是你可以在同一会话 中 写多个消息 ，如果  有一个 (执行人过滤器 在过滤器链中)。 问题在于 SSLEngine 不能够处理多个消息。我们需要 将 被写入的消息 序列化。
+	//更糟糕的是:你不能 同时 处理传入消息和传出的消息。
+
+
+
+All in all, the SSL/TLS processing is like a black box that accept only one input and can't process anything until it has completed its task. the following schema represent the way it works for outgoing messages.
+	//  总之 , SSL/TLS处理就像一个黑盒 , 只接受一个输入 然后 直到它完成任务之前 无法处理任何东西。。。  以下[图片]为传出消息模式代表了它的工作方式  。
+
+   				//此处应该有图  
+
+
+Outgoing messages
+	//传出消息
+
+It's not that different for incoming messages, except that we won't have an Executor between the IoProcessor and the SslFilter. That makes things simpler, except that one critical thing happens : when we process an incoming message, we can't anymore process outgoiing messages. Note that it also works on the other way around : when an outgoing message is being processed, we can't process an incoming message :
+	//与 传入的消息 没什么不同 , 除了（ 在 IoProcessor和SslFilter之间 将有一个 执行人过滤器 ）之外。	 ？？？？
+	//为了 让事情更简单 , 除了一个重要的事情发生 : 当我们处理传入消息的时候,我们不能处理outgoiing消息。
+	//注意,反过来 它还适用于 : 当一个即将 发出 的消息被处理 , 我们不能处理传入消息:
+
+Incoming message
+	//传入消息
+
+What is important here is that the SslHander can't process more than one message at a time.
+	//重要的是SslHander无法处理超过一个消息。
+
+
+SSL/TLS in MINA 2
+	//MINA 2 中的 SSL / TLS
+
+Now, we will dive a bit deeper into MINA code. We will cover all the filter operations:
+	//深入一点 MINA 代码。	我们将涵盖所有过滤器 操作:
+
+    Management   管理
+        init()							//初始化
+        destroy()						//销毁
+        onPreAdd(IoFilterChain, String, NextFilter)		//过滤器的管理方法？？？
+        onPostAdd(IoFilterChain, String, NextFilter)
+        onPreRemove(IoFilterChain, String, NextFilter)
+        onPostRemove(IoFilterChain, String, NextFilter)
+    Session events  会话活动
+        sessionCreated(NextFilter, IoSession)			//新建
+        sessionOpened(NextFilter, IoSession)			//打开
+        sessionClosed(NextFilter, IoSession)			//关闭。（好像被弃用的）
+        sessionIdle(NextFilter, IoSession, IdleStatus)		//闲置
+        exceptionCaught(NextFilter, IoSession, Throwable)	//异常处理
+        filterClose(NextFilter, IoSession)			//关闭过滤器
+        inputClosed(NextFilter, IoSession)			//
+    Messages events  消息事件
+        messageReceived(NextFilter, IoSession, Object)		//消息接收
+        filterWrite(NextFilter, IoSession, WriteRequest)	//	
+        messageSent(NextFilter, IoSession, WriteRequest)	//消息发送
+
+Management	
+
+
+Here are the Filter's management methods :
+	//这里有过滤器的管理方法:
+
+onPreAdd
+
+This is where we create the SslHandler instance, and initialize it. We also define the supported ciphers.
+	//这就是我们创建 SslHandler实例 ,并初始化它。           还定义了 支持密码。
+
+The SslHandler instance will itself create an instanc eof SSLEngine, and configure it with all the parameters set in the SslFilter:
+	//SslHandler实例 将 SSLEngine创建一个本身的实例 , 然后 配置 它所有的参数 在 SslFilter 设置:	/instance of SSLEngine
+
+    If this is client or a server side    //如果 这是 客户端 或 服务器端
+    When it's server side, the flag that says we want or require the client authentication    //在服务器端,flag表示我们想要或需要客户端的身份验证。
+    The list of enabled ciphers           //可用的密码 列表
+    The list of enabled protocols         //可用的协议 列表
+
+
+When it's done, the reference to this instance is stored into the Session's attributes.
+	//当它结束的时候 , 这个实例的引用  被存储 在session的属性中。
+
+onPostAdd	
+This is where we start the handshake if it's not explicitely postponed. This is all what this method does. All the logic is implemented by the SslHandler
+	//这就是我们开始握手的地方，如果不声明 推迟 。 这就是这个方法 所有做的东西  。 所有的 逻辑 都是由 SslHandler 实现
+
+
+onPreRemove
+Here, we stop the SSL session and we cleanup the session (removing the filter from the session's chain and the SslHandler instance from the session's attributes). The Sslhandler instance si also destroyed after having flushed any event that is not yet processed.
+	//在这里 , 我们停止SSL session 然后 清理 session (从session链 中 删除过滤器 然后 从session的属性中 删除SslHandler实例)。
+	//Sslhandler实例（在 刷新任何尚未处理的事件）后 摧毁  。
+
+
+Session events		会话活动
+
+Here are the events that are propagated across the filter's chain and processed by the SslFilter :
+	//这是（由SslFilter处理的、传播在过滤器链的）事件:
+
+
+sessionClosed
+
+We just destroy the SslHandler instance. 
+	//仅 摧毁 SslHandler 实例。
+
+
+exceptionCaught
+
+We have one special task to proceed when the exception is due to a closed session : we have to gather all the messages that we repending to add them to the exception that will be propagated.									   
+	// 当 异常 是由于关闭 session 时，我们有一个特殊的任务进行 : 我们必须收集所有的repending消息将它们添加到 将要传播的异常中。  ？？
+
+
+filterClose
+
+Here, if there is a SSL session started, we need to close it. In any case, we propagate the event into the chain to the next filter.
+	//在这里 , 如果 有一个SSL session 开始 , 我们需要关闭它。在任何情况下 , 我们传播事件到链中下一个过滤器。
+
+Messages events
+	//消息事件
+
+Last, not least, the three events relative to messages :
+	//最后,同样重要的是,这三个事件相对于消息来说的:
+
+messageReceived event
+
+This event is received when we read some data from the socket. We have to take care of a few corner cases : The handshake has been completed The handshake has been started but is not completed * No handshake has started, and the SslHandler is not yet initialized
+	// , 当我们从socket中读取一些数据 时 收到这个事件 。 我们必须照顾一些 边缘 情况 : 握手 已完成、启动   但仍未完成*没有握手开始 , 还有 SslHandler 尚未初始化
+
+Those three use cases are listed by order of frequency. Let's see what is going to happen for each of those use cases.
+	//这三个用例 按频率 顺序列出 。 
+
+
+The handshake has been completed
+	//握手已经完成
+
+Good ! That means every incoming message is encapsulated in a SSL/TLS envelop, and should be decrypted. Now, we are talking about messages, but we actually receive bytes, that may need to be aggregated to form a full message (at least in TCP). If a message is fragmented, we will receive many buffers, and we will be able to decrypt it fully when we will receive the last piece. Remember that we are blocked during all the process, which can block the SslHandler instance for this session for quite some time...
+/*
+这意味着每一个传入消息封装在一个SSL/TLS信封,而且应该解密。
+现在,我们讨论的是信息 ,   但实际上收到 的 字节,可能 需要 进行 聚合 , 来 形成完整的信息  (至少在TCP 中是这样的)。
+如果消息是 支离破碎的 , 我们会收到许多缓冲区 , 然后 当我们收到最后一块时 我们将能够完全解密它。
+记住 , 我们在 所有的过程中 被阻塞 , 它可以 对这次session 阻塞 SslHandler实例 很长一段时间……
+*/
+
+In any case, every block of data is processed by the SslHandler, which delegates to the SslEngine the decryption of the bytes it received.
+	//在任何情况下,每个数据块都是由SslHandler处理,它代表SslEngine解密接收的字节。
+
+Here is the basic algorithm we have implemented in messageReceived() :
+	//这是我们 在messageReceived()中 已经实现的基本算法:
+
+get the session's sslHandler
+					//伪代码
+
+syncrhonized on sshHandler {
+    if handshake completed
+        then
+            get the sslHandler decrypting the data
+            if the application buffer is completed, push it into the message to forward to the IoHandler
+        else
+            enqueue the incoming data
+}
+
+
+
+flush the messages if any
+
+
+
+The important part here is that the SslHandler will cumulate the data until it has a complete message to push into the chain. This may take a while, and many socket reads. The reason is that the SSLEngine cannot process a message unless it has all the bytes deended to decode the message fully.
+	//这里的 重要部分 是SslHandler将 累积 数据 ,直到有一个完整的消息 进入 链 。  这可能需要一段时间 , 许多socket读取。
+	//原因是 SSLEngine 无法处理消息 , 除非它有所有字节需要解码的信息 完全解码。
+
+	Tip : increase the transmission buffer size to limit the number of round trips necessary to send a big message.
+		//提示:增加传输缓冲区大小限制 往返需要的数量发送一个大消息。
+
+
+
+The handshake has not been completed
+	//握手还未完成
+
+The means the received message is part of the Handshake protocol. Nothing will be propagated to the IoHandler, the message will be consumed by the SslHandler.
+	//意味着  收到消息  是握手协议的一部分  。		 什么都不会 传播到 IoHandler , 消息将被 SslHandler 使用。  ？？
+
+Until the full handshake is completed, every incoming data will be considered as a Handshake protocl message.
+	//直到完成 完整的握手 ,         每个传入的数据 将 被视为一个握手协议的消息。
+
+At the same time, messages that the IoHandler will be enqueued, waiting for the Handshake to be completed.
+	//同时,    消息   被 IoHandler  加入队列  , 然后  等待握手完成。
+
+Here is a schema representing the full process when the data are received in two round-trips :
+	//这是一个 代表完整的过程 图解[图]  , 当数据在 两端 传送 接收时 :
+
+
+Unwrapping message	//此处是图 。（ 内容是 被各种 过滤器 传来穿去。。最终被 IoHandle received)
+
+
+
+
+filterwWrite event
+
+This event is processed when the IoSession.write() method is called.
+	//当  IoSession.write()方法被调用    这个事件被处理。
+
+If the SSL session is not started, we simply accumulate the message to write. It will be send later.
+	//如果SSL session 没有开始, 我们只是积累消息去写入                      。它将在稍后发送。
+
+
+注意：
+There is one tricky parameter that comes into play here, for some very specific need. Typically, when implementing the startTLS protocol, where the server is switching from a non secured connection to a secured connection by the mean of an application message (and potentially a response), we need the response to be send back to the client before the SslFilter is installed (otherwise, the response will be blocked, and the etablishement of a secured connection will simply fail). This is the DISABLE_ENCRYPTION_ONCE Attribute. It does not matter what it contains (it can be just a boolean), it's enough for this parameter to be present in the session for the first message to bypasse the SslFilter.
+/*
+在这里有一个棘手的 参数  , 来应对一些非常 特殊 的需要。
+通常, 实现startTLS协议 意味着, 服务器 （通过一个应用程序消息(和潜在的响应)） 从一个非安全连接 切换到 一个安全连接  ,
+我们需要响应发送回客户机之前SslFilter安装(否则,响应将被阻塞,etablishement安全连接会失败)。
+这是 DISABLE_ENCRYPTION_ONCE 属性。
+它包含 啥 都所谓( 仅可以是一个布尔值 ) , 为了 （在session绕过   SslFilter第一消息 ) 这个参数就足够了  ？？？？？？     ·[bypass the SslFilter]·。
+*/
+
+
+
+We control the presence of the DISABLE_ENCRYPTION_ONCE flag in the session's attributes, and if present, we remove it from the session, and push the message uncrypted into the messages queue to be send.			
+	//我们控制    DISABLE_ENCRYPTION_ONCE flag 在session 属性中的存在  ,              如果 存在  ,我们将它从session中移除 , 然后 push加密的消息 到队列的消息被发送。
+
+Otherwise, if the handshake is not yet completed, we keep the message in a queue, and if it's completed, we encrypt it and schedule it to be written.
+	//假如不存在 ： 如果握手还没有完成 ,       我们保持消息到一个队列中          ,如果完成              ,我们把它加密       然后安排它写入。
+
+If some message has been scheduled for write, we flus them all.
+	//如果已经安排 写入 一些消息 ,         我们  把它他们都  冲掉flush？   （flus流感？）。   ？？？？？？？？？？？？？？？？？？？？？？？？？？？？？
+
+messageSent event
+
+Here, it's just a matter of getting back the unencrypted message to propagate it to the IoHandler
+	//在这里,它  只是一种    回到未加密的消息  去传播到  IoHandler
+
+
+SSLContext initialisation
+	//SSLContext初始化
+
+We saw that in order to establish a SSL session, we need to create a SSLContext. Here is the code :
+	// 为了建立SSL session,我们需要创建一个SSLContext。这是代码:
+
+
+SSLContext sslContext;
+
+try
+{
+    // Initialize the SSLContext to work with our key managers.
+    sslContext = SSLContext.getInstance( "TLS" );
+    sslContext.init( ... ); // Provide the needed KeyManager[], TrustManager[] and SecureRandom instances
+}
+catch ( Exception e )
+{
+    // Handle your exception
+}
+
+
+What we have not exposed here is the constructor and the init() method.
+	//我们没有 说明（揭露） 的是   构造函数     和     init()方法。
+
+The SSLContext can either be created explicitely - through its constructor -, or we ask the static factory to return an instance (this is what we have done in the previous code. teh second method is quite straightforward, and would fit most of the time. It's enough to pass it the name of the protocol to use, which is one of :
+	//SSLContext 可以显式的创建 —— 通过其构造函数，，,或者我们让静态工厂     返回一个实例    (我们的在前面的代码  都是这样做的。）
+	//（teh试验设备连接装置？）第二种方法非常简单        ,适合大部分情况       。 通过使用协议的名称 就足够了。   有这么几个:：
+
+    SSL
+    SSLv2
+    SSLv3
+    TLS
+    TLSv1
+    TLSv1.1
+    TLSv1.2 (not supported in Java 6)		//Java6 不支持 TLSv1.2
+
+It's strongly suggested to pick the higher algorithm (ie TLSv1.2) if your client supports it.
+	//如果你的客户支持，强烈建议选择更高的算法(即TLSv1.2)。
+
+The init() method takes 3 arguments :
+	//init()  有        3个参数:
+
+    a KeyManager (can be null)		//KeyManager(可以为空)
+    a TrustManager (can be null)	//TrustManager(可以为空)
+    a random generator (can be null)	//一个随机发生器(可以为空)
+
+If the parameters are set to null, the installed security provider will pick the highest priority implementation.	
+	//如果参数被设置为null ,    安全提供者会选择优先级最高的实现。
+
+**************************************************************************************************************************************
+
+
+

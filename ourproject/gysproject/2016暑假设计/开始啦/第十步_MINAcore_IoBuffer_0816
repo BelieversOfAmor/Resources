@@ -1,0 +1,167 @@
+					Chapter 8 - IoBuffer
+
+	#08#16#
+**************************************************************************************************************************8
+
+A byte buffer used by MINA applications.	//MINA 使用的一个 字节缓冲区
+
+This is a replacement for ByteBuffer. MINA does not use NIO ByteBuffer directly for two reasons:
+//是ByteBuffer 的替代品 。。    MINA直接不用 阻塞式的 ByteBuffer 的两大原因：
+
+    It doesn't provide useful getters and putters such as fill, get/putString, and get/putAsciiInt() .
+	//ByteBuffer   不提供有用的 getters and putters，，例如 fill, get/putString, and get/putAsciiInt() 方法。
+    It is difficult to write variable-length data due to its fixed capacity
+	//由于 ByteBuffer  固定的容量， 很难写入 长度可变的 数据。
+
+This will change in MINA 3. The main reason why MINA has its own wrapper on top of nio ByteBuffer is to have extensible buffers. This was a very bad decision. Buffers are just buffers : a temporary place to store temporary data, before it is used. Many other solutions exist, like defining a wrapper which relies on a list of NIO ByteBuffers, instead of copying the existing buffer to a bigger one just because we want to extend the buffer capacity.
+/*  在 MINA 3 里 会改变， ， 我先不去关注了。 先学好2. */
+
+It might also be more comfortable to use an InputStream instead of a byte buffer all along the filters, as it does not imply anything about the nature of the stored data : it can be a byte array, strings, messages...
+/*  在 MINA 3 里 会改变， ， 我先不去关注了。 先学好2. */
+Last, not least, the current implementation defeat one of the target : zero-copy strategy (ie, once we have read the data from the socket, we want to avoid a copy being done later). As we use extensible byte buffers, we will most certainly copy those data if we have to manage big messages. Assuming that the MINA ByteBuffer is just a wrapper on top of NIO ByteBuffer, this can be a real problem when using direct buffers.
+/*  在 MINA 3 里 会改变， ， 我先不去关注了。 先学好2. */
+
+
+
+IoBuffer Operations  
+	//IoBuffer 功能 0.0 
+
+
+
+Allocating a new Buffer	
+	//分配新的Buffer
+
+IoBuffer is an abstract class, hence can't be instantiated directly. To allocate IoBuffer, we need to use one of the two allocate() methods.
+	//IoBuffer是一个抽象类,  因此不能直接实例化。    为了分配IoBuffer,    需要使用 两个 allocate()方法  之一。
+
+// Allocates a new buffer with a specific size, defining its type (direct or heap)         指定大小，，给它定义一个类型（直接 还是 堆）
+public static IoBuffer allocate(int capacity, boolean direct)
+
+// Allocates a new buffer with a specific size						仅 指定大小
+public static IoBuffer allocate(int capacity)
+
+The allocate() method takes one or two arguments. The first form takes two arguments : 
+
+    capacity - the capacity of the buffer	//buffer 容量
+    direct - type of buffer. true to get direct buffer, false to get heap buffer  //ture直接的缓冲区，  false 得到一个  堆缓冲区。 
+
+The default buffer allocation is handled by SimpleBufferAllocator    
+	//默认的缓冲区 由 SimpleBufferAllocator 来处理
+
+Alternatively, following form can also be used       
+	//另外 还可以用下面的形式
+
+// Allocates heap buffer by default.
+IoBuffer.setUseDirectBuffer(false);
+// A new heap buffer is returned.
+IoBuffer buf = IoBuffer.allocate(1024);
+
+When using the second form, don't forget to set the default buffer type before, otherwise you will get Heap buffers by default.
+	//使用第二种形式时,    要 提前设置默认缓冲类型, 否则将得到   默认 堆缓冲区。
+
+Creating Auto Expanding Buffer
+	//创建自动扩大的  缓冲区
+
+Creating auto expanding buffer is not very easy with java NIO API's, because of the fixed size of the buffers. Having a buffer, that can auto expand on needs is a big plus for networking applications. To address this, IoBuffer has introduced the autoExpand property. It automatically expands its capacity and limit value.
+/*
+用java NIO API创建auto expanding缓冲区 不是很容易,因为缓冲区是固定大小的。
+ 按需自动扩展 缓冲区    是网络应用的一大亮点。
+为了解决这个问题,IoBuffer引入了autoExpand性质（属性）。
+它会自动扩大容量和 极限值 （限制大小？）。
+*/
+
+Lets see how to create an auto expanding buffer :  //咋实现的
+
+IoBuffer buffer = IoBuffer.allocate(8);
+buffer.setAutoExpand(true);
+buffer.putString("12345678", encoder);
+// Add more to this buffer
+buffer.put((byte)10);
+
+The underlying ByteBuffer is reallocated by IoBuffer behind the scene if the encoded data is larger than 8 bytes in the example above. Its capacity will double, and its limit will increase to the last position the string is written. This behavior is very similar to the way StringBuffer class works.
+/*
+IoBuffer幕后 重新分配底层ByteBuffer   如果编码数据大于8个字节(在上面的例子中)。其容量将翻倍, 其限制将增加到字符串的最后位置。这种行为非常类似于StringBuffer类 的工作方式。
+*/
+
+This mechanism is very likely to be removed from MINA 3.0, as it's not really the best way to handle increased buffer size. It should be replaced by something like a InputStream hiding a list or an array of fixed sized ByteBuffers.
+
+
+
+Creating Auto Shrinking Buffer
+	//创建自动缩小的 缓冲区
+
+There are situations which calls for releasing additionally allocated bytes from the buffer, to preserve memory. IoBuffer provides autoShrink property to address the need. If autoShrink is turned on, IoBuffer halves the capacity of the buffer when compact() is invoked and only 1/4 or less of the current capacity is being used. To manually shrink the buffer, use shrink() method.
+/*有些情况下,呼吁从缓冲区释放另外分配的字节,为了保存记忆。IoBuffer提供自动缩小的属性。
+  如果自动缩小属性 打开,  当compact()方法被调用时，IoBuffer缓冲区的容量减半,只有1/4或更少（当前的容量使用时）。
+  为了手动收缩缓冲区,使用 shrink()方法。
+*/
+
+
+Lets see this in action :
+
+IoBuffer buffer = IoBuffer.allocate(16);
+buffer.setAutoShrink(true);
+buffer.put((byte)1);
+System.out.println("Initial Buffer capacity = "+buffer.capacity());
+buffer.shrink();
+System.out.println("Initial Buffer capacity after shrink = "+buffer.capacity());
+buffer.capacity(32);
+System.out.println("Buffer capacity after incrementing capacity to 32 = "+buffer.capacity());
+buffer.shrink();
+System.out.println("Buffer capacity after shrink= "+buffer.capacity());
+
+We have initially allocated a capacity as 16, and set the autoShrink property as true.
+//最初分配 的容量为16, autoShrink属性 设置为ture。
+
+Lets see the output of this :
+
+Initial Buffer capacity = 16
+Initial Buffer capacity after shrink = 16
+Buffer capacity after incrementing capacity to 32 = 32
+Buffer capacity after shrink= 16
+
+Lets take a break and analyze the output
+//分析输出
+
+    Initial buffer capacity is 16, as we created the buffer with this capacity. Internally this becomes the minimum capacity of the buffer
+		//初始缓冲容量是16,       用这个容量作为创建的缓冲区。   在内部 这变成了最低的缓冲容量。。
+    After calling shrink(), the capacity remains 16, as capacity shall never be less than minimum capacity
+		//调用shrink() 后, 容量仍然是16,         容量 永远不会小于最小容量。
+    After incrementing capacity to 32, the capacity becomes 32
+		//容量 增加到32,变成了32。
+    Call to shrink(), reduces the capacity to 16, thereby eliminating extra storage
+		//shrink()调用, 容量减少到 16 , 从而消除了 额外的存储
+
+Again, this mechanism should be a default one, without needing to explicitely tells the buffer that it can shrink.
+//这种机制应该是 默认的 , 无需显式的声明缓冲可以缩小。
+
+
+
+Buffer Allocation	
+	//缓冲区分配
+
+
+IoBufferAllocater is responsible for allocating and managing buffers. To have precise control on the buffer allocation policy, implement the IoBufferAllocater interface.
+//IoBufferAllocater负责分配和管理缓冲区。  实现IoBufferAllocater接口，，为了精确控制 缓冲区分配策略, 。
+
+MINA ships with following implementations of IoBufferAllocater
+	//米娜附带IoBufferAllocater的实现
+
+    SimpleBufferAllocator (default) - Create a new buffer every time
+	//SimpleBufferAllocator  默认  ,  每次都创建一个新的 缓冲区
+    CachedBufferAllocator - caches the buffer which are likely to be reused during expansion
+	//CachedBufferAllocator    缓存 可能（在扩张中）被重用   缓冲区  
+
+
+With the new available JVM, using cached IoBuffer is very unlikely to improve performances.
+	//在新的可用的JVM中用,   使用 缓存的 IoBuffer 很可能 可以   提高性能。
+
+You can implement you own implementation of IoBufferAllocator and call setAllocator() on IoBuffer to use the same.
+	//您可以实现 您自己的IoBufferAllocator实现（n.），并在IoBuffer上调用setAllocator()方法 （为了使用相同的）。
+
+
+#08#16#
+**************************************************************************************************************************8
+
+
+
